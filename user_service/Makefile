@@ -11,12 +11,3 @@ clean:
 
 swagger:
 	swag init -g ./cmd/app/main.go -o ./docs
-
-migrate:
-	$(APP_BIN) migrate -version $(version)
-
-migrate.down:
-	$(APP_BIN) migrate -seq down
-
-migrate.up:
-	$(APP_BIN) migrate -seq up
