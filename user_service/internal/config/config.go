@@ -19,13 +19,13 @@ type Config struct {
 		LogLevel string `env:"LOG_LEVEL" env-default:"trace"`
 	}
 	MongoDB struct {
-		Host       string `env:"HOST"`
-		Port       string `env:"PORT"`
-		Database   string `env:"DATABASE"`
+		Host       string `env:"HOST" env-default:"localhost"`
+		Port       string `env:"PORT" env-default:"27017"`
+		Username   string `env:"ADMIN_USERNAME"`
+		Password   string `env:"ADMIN_PASSWORD"`
+		Collection string `env:"COLLECTION" env-default:"users"`
+		Database   string `env:"DATABASE" env-default:"user-service"`
 		AuthDB     string `env:"AUTH_DB"`
-		Username   string `env:"USERNAME"`
-		Password   string `env:"PASSWORD"`
-		Collection string `env:"COLLECTION"`
 	}
 }
 
