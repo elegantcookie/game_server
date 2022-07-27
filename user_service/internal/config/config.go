@@ -16,11 +16,16 @@ type Config struct {
 		Port       string `env:"PORT" env-default:"10002"`
 	}
 	AppConfig struct {
-		LogLevel  string `env:"LOG_LEVEL" env-default:"trace"`
-		AdminUser struct {
-			Email    string `env:"ADMIN_EMAIL" env-default:"admin"`
-			Password string `env:"ADMIN_PWD" env-default:"admin"`
-		}
+		LogLevel string `env:"LOG_LEVEL" env-default:"trace"`
+	}
+	MongoDB struct {
+		Host       string `env:"HOST"`
+		Port       string `env:"PORT"`
+		Database   string `env:"DATABASE"`
+		AuthDB     string `env:"AUTH_DB"`
+		Username   string `env:"USERNAME"`
+		Password   string `env:"PASSWORD"`
+		Collection string `env:"COLLECTION"`
 	}
 }
 
