@@ -47,7 +47,38 @@ func (d *db) FindOne(ctx context.Context, id string) (u user.User, err error) {
 
 }
 func (d *db) Update(ctx context.Context, user user.User) error {
+	objectID, err := primitive.ObjectIDFromHex(user.ID)
+	if err != nil {
+		return fmt.Errorf("failed to convert user ID to ObjectID. ID=%v", user.ID)
+	}
 
+	filter := bson.M{"_id": objectID}
+
+	userBytes, err := bson.Marshal(user)
+	if err != nil {
+		return fmt.Errorf("failed to marshal user due to: %v", err)
+	}
+
+	var updateUserObj bson.M
+	err = bson.Unmarshal(userBytes, &updateUserObj)
+	if err != nil {
+		return fmt.Errorf("failed to unmarshal user bytes due to: %v", err)
+	}
+	delete(updateUserObj, "_id")
+	update := bson.M{
+		"$set": updateUserObj,
+	}
+	result, err := d.collection.UpdateOne(ctx, filter, update)
+	if err != nil {
+		return fmt.Errorf("failed to execute update user query due to: %v", err)
+	}
+
+	if result.MatchedCount == 0 {
+		// TODO ErrEntityNotFound
+		return fmt.Errorf("not found")
+	}
+
+	return nil
 }
 func (d *db) Delete(ctx context.Context, id string) error {
 
