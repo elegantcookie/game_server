@@ -11,6 +11,7 @@ import (
 
 const (
 	usersURL    = "/api/users"
+	authUrl     = "/api/users/auth"
 	userIdURL   = "/api/users/id/:id"
 	usernameURL = "/api/users/username/:username"
 )
@@ -25,6 +26,7 @@ func (h *Handler) Register(router *httprouter.Router) {
 	router.HandlerFunc(http.MethodGet, usersURL, apperror.Middleware(h.GetUsers))
 	router.HandlerFunc(http.MethodPost, userIdURL, apperror.Middleware(h.GetUserById))
 	router.HandlerFunc(http.MethodPost, usernameURL, apperror.Middleware(h.GetUserByUsername))
+	router.HandlerFunc(http.MethodPost, authUrl, apperror.Middleware(h.GetUserByUsernameAndPassword))
 	//router.HandlerFunc(httpclient.MethodPatch, userURL, apperror.Middleware(h.PartiallyUpdateUser))
 	router.HandlerFunc(http.MethodDelete, userIdURL, apperror.Middleware(h.DeleteUser))
 }
@@ -62,6 +64,34 @@ func (h *Handler) GetUserByUsername(w http.ResponseWriter, r *http.Request) erro
 	username := params.ByName("username")
 
 	user, err := h.UserService.GetByUsername(r.Context(), username)
+	if err != nil {
+		return err
+	}
+
+	h.Logger.Debug("marshal user")
+	userBytes, err := json.Marshal(user)
+	if err != nil {
+		return fmt.Errorf("failed to marshall user. error: %w", err)
+	}
+
+	w.WriteHeader(http.StatusOK)
+	w.Write(userBytes)
+	return nil
+}
+
+func (h *Handler) GetUserByUsernameAndPassword(w http.ResponseWriter, r *http.Request) error {
+	h.Logger.Info("GET USER BY USERNAME")
+	w.Header().Set("Content-Type", "application/json")
+
+	h.Logger.Debug("get username from context")
+
+	var dto CreateUserDTO
+	err := json.NewDecoder(r.Body).Decode(&dto)
+	if err != nil {
+		return fmt.Errorf("unable to decode response body due to: %v", err)
+	}
+
+	user, err := h.UserService.GetByUsernameAndPassword(r.Context(), dto.Username, dto.Password)
 	if err != nil {
 		return err
 	}

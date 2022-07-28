@@ -63,7 +63,6 @@ func (d *db) FindByUsername(ctx context.Context, username string) (u user.User, 
 		return u, fmt.Errorf("failed to decode user(username:%s) from DB due to error: %v", username, err)
 	}
 	return u, nil
-
 }
 
 func (d *db) FindAll(ctx context.Context) (users []user.User, err error) {

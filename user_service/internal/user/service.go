@@ -27,7 +27,7 @@ type Service interface {
 	GetAll(ctx context.Context) ([]User, error)
 	GetById(ctx context.Context, uuid string) (User, error)
 	GetByUsername(ctx context.Context, username string) (User, error)
-	//Update(ctx context.Context, dto UpdateUserDTO) error
+	GetByUsernameAndPassword(ctx context.Context, username, password string) (u User, err error)
 	Delete(ctx context.Context, uuid string) error
 }
 
@@ -70,6 +70,25 @@ func (s service) GetById(ctx context.Context, id string) (u User, err error) {
 
 func (s service) GetByUsername(ctx context.Context, username string) (u User, err error) {
 	u, err = s.storage.FindByUsername(ctx, username)
+	if err != nil {
+		if errors.Is(err, apperror.ErrNotFound) {
+			return u, err
+		}
+		return u, fmt.Errorf("failed to find user by username. error: %w", err)
+	}
+	return u, nil
+}
+
+func (s service) GetByUsernameAndPassword(ctx context.Context, username, password string) (u User, err error) {
+	u, err = s.storage.FindByUsername(ctx, username)
+
+	err = u.CheckPassword(password)
+	if err != nil {
+		return User{}, err
+	}
+	if err != nil {
+		return u, err
+	}
 
 	if err != nil {
 		if errors.Is(err, apperror.ErrNotFound) {
@@ -87,44 +106,6 @@ func (s service) GetAll(ctx context.Context) ([]User, error) {
 	}
 	return users, nil
 }
-
-//func (s service) Update(ctx context.Context, dto UpdateUserDTO) error {
-//	var updatedUser User
-//	s.logger.Debug("compare old and new passwords")
-//	if dto.OldPassword != dto.NewPassword || dto.NewPassword == "" {
-//		s.logger.Debug("get user by uuid")
-//		user, err := s.GetOne(ctx, dto.ID)
-//		if err != nil {
-//			return err
-//		}
-//
-//		s.logger.Debug("compare hash current password and old password")
-//		err = bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(dto.OldPassword))
-//		if err != nil {
-//			return apperror.BadRequestError("old password does not match current password")
-//		}
-//
-//		dto.Password = dto.NewPassword
-//	}
-//
-//	updatedUser = UpdatedUser(dto)
-//
-//	s.logger.Debug("generate password hash")
-//	err := updatedUser.GeneratePasswordHash()
-//	if err != nil {
-//		return fmt.Errorf("failed to update user. error %w", err)
-//	}
-//
-//	err = s.storage.Update(ctx, updatedUser)
-//
-//	if err != nil {
-//		if errors.Is(err, apperror.ErrNotFound) {
-//			return err
-//		}
-//		return fmt.Errorf("failed to update user. error: %w", err)
-//	}
-//	return nil
-//}
 
 func (s service) Delete(ctx context.Context, uuid string) error {
 	err := s.storage.Delete(ctx, uuid)

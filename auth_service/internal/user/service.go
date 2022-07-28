@@ -41,10 +41,18 @@ func (s service) SignIn(ctx context.Context, body io.ReadCloser) (token string, 
 	if err != nil {
 		return "", err
 	}
+	// if FindByUsername can't find user then it creates new user
 	if uuid == "" {
+		s.logger.Printf("NEW USER")
 		err := s.storage.Create(ctx, dto)
 		if err != nil {
 			return "", fmt.Errorf("unable to create new user due to: %v", err)
+		}
+	} else {
+		s.logger.Printf("FINDING USER IN DB BY USERNAME AND PASSWORD")
+		uuid, err = s.storage.FindByUsernameAndPassword(ctx, dto)
+		if err != nil {
+			return "", fmt.Errorf("unable to authorize due to: %v", err)
 		}
 	}
 	token, err = jwt_setup.CreateToken(config.GetConfig(), uuid)
