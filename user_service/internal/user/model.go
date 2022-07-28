@@ -12,17 +12,16 @@ type User struct {
 }
 
 type CreateUserDTO struct {
-	Username       string `json:"username"`
-	Password       string `json:"password"`
-	RepeatPassword string `json:"repeat_password" bson:"-"`
+	Username string `json:"username"`
+	Password string `json:"password"`
 }
 
-type UpdateUserDTO struct {
-	ID          string `json:"id,omitempty" bson:"_id,omitempty"`
-	Password    string `json:"password,omitempty" bson:"password,omitempty"`
-	OldPassword string `json:"old_password,omitempty" bson:"-"`
-	NewPassword string `json:"new_password,omitempty" bson:"-"`
-}
+//type UpdateUserDTO struct {
+//	ID          string `json:"id,omitempty" bson:"_id,omitempty"`
+//	Password    string `json:"password,omitempty" bson:"password,omitempty"`
+//	OldPassword string `json:"old_password,omitempty" bson:"-"`
+//	NewPassword string `json:"new_password,omitempty" bson:"-"`
+//}
 
 func NewUser(dto CreateUserDTO) User {
 	return User{
@@ -31,12 +30,12 @@ func NewUser(dto CreateUserDTO) User {
 	}
 }
 
-func UpdatedUser(dto UpdateUserDTO) User {
-	return User{
-		ID:       dto.ID,
-		Password: dto.Password,
-	}
-}
+//func UpdatedUser(dto UpdateUserDTO) User {
+//	return User{
+//		ID:       dto.ID,
+//		Password: dto.Password,
+//	}
+//}
 
 func (u *User) CheckPassword(password string) error {
 	err := bcrypt.CompareHashAndPassword([]byte(u.Password), []byte(password))

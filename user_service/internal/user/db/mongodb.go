@@ -49,6 +49,18 @@ func (d *db) FindOne(ctx context.Context, id string) (u user.User, err error) {
 	return u, nil
 
 }
+
+func (d *db) Find(ctx context.Context) (users []user.User, err error) {
+	cursor, err := d.collection.Find(ctx, bson.M{})
+	if cursor.Err() != nil {
+		return users, fmt.Errorf("failed to find all users due to: %v", cursor.Err())
+	}
+	if err := cursor.All(ctx, &users); err != nil {
+		return users, fmt.Errorf("failed to read all documents from cursor")
+	}
+	return users, nil
+}
+
 func (d *db) Update(ctx context.Context, user user.User) error {
 	objectID, err := primitive.ObjectIDFromHex(user.ID)
 	if err != nil {

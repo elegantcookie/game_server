@@ -2,12 +2,14 @@ package apperror
 
 import (
 	"errors"
+	"log"
 	"net/http"
 )
 
 type appHandler func(http.ResponseWriter, *http.Request) error
 
 func Middleware(h appHandler) http.HandlerFunc {
+	log.Println("got into middleware")
 	return func(w http.ResponseWriter, r *http.Request) {
 		var appErr *AppError
 		err := h(w, r)

@@ -53,7 +53,7 @@ func NewApp(cfg *config.Config, logger *logging.Logger) (App, error) {
 	}
 
 	usersHandler := user.Handler{
-		Logger:      logging.Logger{},
+		Logger:      logging.GetLogger(cfg.AppConfig.LogLevel),
 		UserService: service,
 	}
 	usersHandler.Register(router)

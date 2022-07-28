@@ -4,7 +4,6 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"golang.org/x/crypto/bcrypt"
 	"user_service/internal/apperror"
 	"user_service/pkg/logging"
 )
@@ -25,16 +24,14 @@ func NewService(userStorage Storage, logger logging.Logger) (Service, error) {
 
 type Service interface {
 	Create(ctx context.Context, dto CreateUserDTO) (string, error)
+	GetAll(ctx context.Context) ([]User, error)
 	GetOne(ctx context.Context, uuid string) (User, error)
-	Update(ctx context.Context, dto UpdateUserDTO) error
+	//Update(ctx context.Context, dto UpdateUserDTO) error
 	Delete(ctx context.Context, uuid string) error
 }
 
 func (s service) Create(ctx context.Context, dto CreateUserDTO) (userID string, err error) {
-	s.logger.Debug("check password and repeat password")
-	if dto.Password != dto.RepeatPassword {
-		return userID, apperror.BadRequestError("password does not match repeat password")
-	}
+	s.logger.Debug("check password")
 
 	user := NewUser(dto)
 
@@ -70,43 +67,51 @@ func (s service) GetOne(ctx context.Context, id string) (u User, err error) {
 	return u, nil
 }
 
-func (s service) Update(ctx context.Context, dto UpdateUserDTO) error {
-	var updatedUser User
-	s.logger.Debug("compare old and new passwords")
-	if dto.OldPassword != dto.NewPassword || dto.NewPassword == "" {
-		s.logger.Debug("get user by uuid")
-		user, err := s.GetOne(ctx, dto.ID)
-		if err != nil {
-			return err
-		}
-
-		s.logger.Debug("compare hash current password and old password")
-		err = bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(dto.OldPassword))
-		if err != nil {
-			return apperror.BadRequestError("old password does not match current password")
-		}
-
-		dto.Password = dto.NewPassword
-	}
-
-	updatedUser = UpdatedUser(dto)
-
-	s.logger.Debug("generate password hash")
-	err := updatedUser.GeneratePasswordHash()
+func (s service) GetAll(ctx context.Context) ([]User, error) {
+	users, err := s.storage.Find(ctx)
 	if err != nil {
-		return fmt.Errorf("failed to update user. error %w", err)
+		return users, fmt.Errorf("failed to find users. error: %v", err)
 	}
-
-	err = s.storage.Update(ctx, updatedUser)
-
-	if err != nil {
-		if errors.Is(err, apperror.ErrNotFound) {
-			return err
-		}
-		return fmt.Errorf("failed to update user. error: %w", err)
-	}
-	return nil
+	return users, nil
 }
+
+//func (s service) Update(ctx context.Context, dto UpdateUserDTO) error {
+//	var updatedUser User
+//	s.logger.Debug("compare old and new passwords")
+//	if dto.OldPassword != dto.NewPassword || dto.NewPassword == "" {
+//		s.logger.Debug("get user by uuid")
+//		user, err := s.GetOne(ctx, dto.ID)
+//		if err != nil {
+//			return err
+//		}
+//
+//		s.logger.Debug("compare hash current password and old password")
+//		err = bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(dto.OldPassword))
+//		if err != nil {
+//			return apperror.BadRequestError("old password does not match current password")
+//		}
+//
+//		dto.Password = dto.NewPassword
+//	}
+//
+//	updatedUser = UpdatedUser(dto)
+//
+//	s.logger.Debug("generate password hash")
+//	err := updatedUser.GeneratePasswordHash()
+//	if err != nil {
+//		return fmt.Errorf("failed to update user. error %w", err)
+//	}
+//
+//	err = s.storage.Update(ctx, updatedUser)
+//
+//	if err != nil {
+//		if errors.Is(err, apperror.ErrNotFound) {
+//			return err
+//		}
+//		return fmt.Errorf("failed to update user. error: %w", err)
+//	}
+//	return nil
+//}
 
 func (s service) Delete(ctx context.Context, uuid string) error {
 	err := s.storage.Delete(ctx, uuid)
