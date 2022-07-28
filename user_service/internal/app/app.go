@@ -14,6 +14,9 @@ import (
 	"path/filepath"
 	"time"
 	"user_service/internal/config"
+	"user_service/internal/user"
+	"user_service/internal/user/db"
+	"user_service/pkg/client/mongodb"
 	"user_service/pkg/logging"
 	"user_service/pkg/metrics"
 )
@@ -25,7 +28,7 @@ type App struct {
 	httpServer *http.Server
 }
 
-func NewApp(config *config.Config, logger *logging.Logger) (App, error) {
+func NewApp(cfg *config.Config, logger *logging.Logger) (App, error) {
 	logger.Println("router initializing")
 	router := httprouter.New()
 
@@ -37,8 +40,26 @@ func NewApp(config *config.Config, logger *logging.Logger) (App, error) {
 	metricHandler := metrics.Handler{}
 	metricHandler.Register(router)
 
+	mongodbClient, err := mongodb.NewClient(context.Background(), cfg.MongoDB.Host, cfg.MongoDB.Port,
+		cfg.MongoDB.Username, cfg.MongoDB.Password, cfg.MongoDB.Database, cfg.MongoDB.AuthDB)
+	if err != nil {
+		panic(err)
+	}
+
+	storage := db.NewStorage(mongodbClient, "users", logger)
+	service, err := user.NewService(storage, *logger)
+	if err != nil {
+		panic(err)
+	}
+
+	usersHandler := user.Handler{
+		Logger:      logging.GetLogger(cfg.AppConfig.LogLevel),
+		UserService: service,
+	}
+	usersHandler.Register(router)
+
 	return App{
-		config,
+		cfg,
 		logger,
 		router,
 		nil,

@@ -16,7 +16,7 @@ const docTemplate = `{
     "host": "{{.Host}}",
     "basePath": "{{.BasePath}}",
     "paths": {
-        "/api/heartbeat": {
+        "/userapi/heartbeat": {
             "get": {
                 "tags": [
                     "Metrics"

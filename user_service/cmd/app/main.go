@@ -19,6 +19,7 @@ func main() {
 	if err != nil {
 		logger.Fatal(err)
 	}
+
 	logger.Println("running Application")
 	a.Run()
 }

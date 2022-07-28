@@ -2,6 +2,8 @@ package app
 
 import (
 	"auth_service/internal/config"
+	"auth_service/internal/user"
+	"auth_service/internal/user/userapi"
 	"auth_service/pkg/logging"
 	"auth_service/pkg/metrics"
 	"context"
@@ -25,7 +27,7 @@ type App struct {
 	httpServer *http.Server
 }
 
-func NewApp(config *config.Config, logger *logging.Logger) (App, error) {
+func NewApp(cfg *config.Config, logger *logging.Logger) (App, error) {
 	logger.Println("router initializing")
 	router := httprouter.New()
 
@@ -37,8 +39,17 @@ func NewApp(config *config.Config, logger *logging.Logger) (App, error) {
 	metricHandler := metrics.Handler{}
 	metricHandler.Register(router)
 
+	storage := userapi.NewStorage(logger)
+	service := user.NewService(storage, logger)
+
+	usersHandler := user.Handler{
+		Logger:      logging.GetLogger(cfg.AppConfig.LogLevel),
+		AuthService: service,
+	}
+	usersHandler.Register(router)
+
 	return App{
-		config,
+		cfg,
 		logger,
 		router,
 		nil,
