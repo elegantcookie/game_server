@@ -39,7 +39,7 @@ func (e *AppError) Marshal() []byte {
 }
 
 func BadRequestError(message string) *AppError {
-	return NewAppError(nil, message, "NS-000002", "something wrong with user data")
+	return NewAppError(nil, message, "NS-000002", "some thing wrong with user data")
 }
 
 func systemError(developerMessage string) *AppError {

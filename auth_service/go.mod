@@ -17,6 +17,7 @@ require (
 	github.com/go-openapi/jsonreference v0.20.0 // indirect
 	github.com/go-openapi/spec v0.20.5 // indirect
 	github.com/go-openapi/swag v0.19.15 // indirect
+	github.com/golang-jwt/jwt/v4 v4.4.2 // indirect
 	github.com/joho/godotenv v1.4.0 // indirect
 	github.com/josharian/intern v1.0.0 // indirect
 	github.com/mailru/easyjson v0.7.6 // indirect

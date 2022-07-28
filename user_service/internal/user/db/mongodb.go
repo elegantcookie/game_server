@@ -30,7 +30,7 @@ func (d *db) Create(ctx context.Context, user user.User) (string, error) {
 	d.logger.Trace(user)
 	return "", fmt.Errorf("failed to convert objectId to hex. probable oid: %s", oid)
 }
-func (d *db) FindOne(ctx context.Context, id string) (u user.User, err error) {
+func (d *db) FindById(ctx context.Context, id string) (u user.User, err error) {
 	oid, err := primitive.ObjectIDFromHex(id)
 	if err != nil {
 		return u, fmt.Errorf("failed to convert hex to objectID, hex: %s", id)
@@ -50,7 +50,23 @@ func (d *db) FindOne(ctx context.Context, id string) (u user.User, err error) {
 
 }
 
-func (d *db) Find(ctx context.Context) (users []user.User, err error) {
+func (d *db) FindByUsername(ctx context.Context, username string) (u user.User, err error) {
+	filter := bson.M{"username": username}
+	result := d.collection.FindOne(ctx, filter)
+	if result.Err() != nil {
+		if errors.Is(result.Err(), mongo.ErrNoDocuments) {
+			// TODO ErrEntityNotFound
+		}
+		return u, fmt.Errorf("failed to find one user by username: %s due to error: %v", username, result.Err())
+	}
+	if err = result.Decode(&u); err != nil {
+		return u, fmt.Errorf("failed to decode user(username:%s) from DB due to error: %v", username, err)
+	}
+	return u, nil
+
+}
+
+func (d *db) FindAll(ctx context.Context) (users []user.User, err error) {
 	cursor, err := d.collection.Find(ctx, bson.M{})
 	if cursor.Err() != nil {
 		return users, fmt.Errorf("failed to find all users due to: %v", cursor.Err())

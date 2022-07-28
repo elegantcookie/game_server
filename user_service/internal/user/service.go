@@ -25,7 +25,8 @@ func NewService(userStorage Storage, logger logging.Logger) (Service, error) {
 type Service interface {
 	Create(ctx context.Context, dto CreateUserDTO) (string, error)
 	GetAll(ctx context.Context) ([]User, error)
-	GetOne(ctx context.Context, uuid string) (User, error)
+	GetById(ctx context.Context, uuid string) (User, error)
+	GetByUsername(ctx context.Context, username string) (User, error)
 	//Update(ctx context.Context, dto UpdateUserDTO) error
 	Delete(ctx context.Context, uuid string) error
 }
@@ -55,8 +56,8 @@ func (s service) Create(ctx context.Context, dto CreateUserDTO) (userID string, 
 }
 
 // GetOne user by id
-func (s service) GetOne(ctx context.Context, id string) (u User, err error) {
-	u, err = s.storage.FindOne(ctx, id)
+func (s service) GetById(ctx context.Context, id string) (u User, err error) {
+	u, err = s.storage.FindById(ctx, id)
 
 	if err != nil {
 		if errors.Is(err, apperror.ErrNotFound) {
@@ -67,8 +68,20 @@ func (s service) GetOne(ctx context.Context, id string) (u User, err error) {
 	return u, nil
 }
 
+func (s service) GetByUsername(ctx context.Context, username string) (u User, err error) {
+	u, err = s.storage.FindByUsername(ctx, username)
+
+	if err != nil {
+		if errors.Is(err, apperror.ErrNotFound) {
+			return u, err
+		}
+		return u, fmt.Errorf("failed to find user by username. error: %w", err)
+	}
+	return u, nil
+}
+
 func (s service) GetAll(ctx context.Context) ([]User, error) {
-	users, err := s.storage.Find(ctx)
+	users, err := s.storage.FindAll(ctx)
 	if err != nil {
 		return users, fmt.Errorf("failed to find users. error: %v", err)
 	}

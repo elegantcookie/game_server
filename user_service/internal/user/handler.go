@@ -10,8 +10,9 @@ import (
 )
 
 const (
-	usersURL = "/api/users"
-	userURL  = "/api/users/:id"
+	usersURL    = "/api/users"
+	userIdURL   = "/api/users/id/:id"
+	usernameURL = "/api/users/username/:username"
 )
 
 type Handler struct {
@@ -22,20 +23,45 @@ type Handler struct {
 func (h *Handler) Register(router *httprouter.Router) {
 	router.HandlerFunc(http.MethodPost, usersURL, apperror.Middleware(h.CreateUser))
 	router.HandlerFunc(http.MethodGet, usersURL, apperror.Middleware(h.GetUsers))
-	router.HandlerFunc(http.MethodGet, userURL, apperror.Middleware(h.GetUser))
-	//router.HandlerFunc(http.MethodPatch, userURL, apperror.Middleware(h.PartiallyUpdateUser))
-	router.HandlerFunc(http.MethodDelete, userURL, apperror.Middleware(h.DeleteUser))
+	router.HandlerFunc(http.MethodPost, userIdURL, apperror.Middleware(h.GetUserById))
+	router.HandlerFunc(http.MethodPost, usernameURL, apperror.Middleware(h.GetUserByUsername))
+	//router.HandlerFunc(httpclient.MethodPatch, userURL, apperror.Middleware(h.PartiallyUpdateUser))
+	router.HandlerFunc(http.MethodDelete, userIdURL, apperror.Middleware(h.DeleteUser))
 }
 
-func (h *Handler) GetUser(w http.ResponseWriter, r *http.Request) error {
-	h.Logger.Info("GET USER")
+func (h *Handler) GetUserById(w http.ResponseWriter, r *http.Request) error {
+	h.Logger.Info("GET USER BY ID")
 	w.Header().Set("Content-Type", "application/json")
 
 	h.Logger.Debug("get uuid from context")
 	params := r.Context().Value(httprouter.ParamsKey).(httprouter.Params)
 	userUUID := params.ByName("id")
 
-	user, err := h.UserService.GetOne(r.Context(), userUUID)
+	user, err := h.UserService.GetById(r.Context(), userUUID)
+	if err != nil {
+		return err
+	}
+
+	h.Logger.Debug("marshal user")
+	userBytes, err := json.Marshal(user)
+	if err != nil {
+		return fmt.Errorf("failed to marshall user. error: %w", err)
+	}
+
+	w.WriteHeader(http.StatusOK)
+	w.Write(userBytes)
+	return nil
+}
+
+func (h *Handler) GetUserByUsername(w http.ResponseWriter, r *http.Request) error {
+	h.Logger.Info("GET USER BY USERNAME")
+	w.Header().Set("Content-Type", "application/json")
+
+	h.Logger.Debug("get username from context")
+	params := r.Context().Value(httprouter.ParamsKey).(httprouter.Params)
+	username := params.ByName("username")
+
+	user, err := h.UserService.GetByUsername(r.Context(), username)
 	if err != nil {
 		return err
 	}
@@ -97,7 +123,7 @@ func (h *Handler) CreateUser(w http.ResponseWriter, r *http.Request) error {
 	return nil
 }
 
-//func (h *Handler) PartiallyUpdateUser(w http.ResponseWriter, r *http.Request) error {
+//func (h *Handler) PartiallyUpdateUser(w httpclient.ResponseWriter, r *httpclient.Request) error {
 //	h.Logger.Info("PARTIALLY UPDATE USER")
 //	w.Header().Set("Content-Type", "application/json")
 //
@@ -116,7 +142,7 @@ func (h *Handler) CreateUser(w http.ResponseWriter, r *http.Request) error {
 //	if err != nil {
 //		return err
 //	}
-//	w.WriteHeader(http.StatusNoContent)
+//	w.WriteHeader(httpclient.StatusNoContent)
 //
 //	return nil
 //}
