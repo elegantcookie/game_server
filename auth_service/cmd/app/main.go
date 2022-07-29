@@ -1,6 +1,7 @@
 package main
 
 import (
+	_ "auth_service/docs"
 	"auth_service/internal/app"
 	"auth_service/internal/config"
 	"auth_service/pkg/logging"
