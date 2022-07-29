@@ -20,7 +20,12 @@ func (h *Handler) Register(router *httprouter.Router) {
 	router.HandlerFunc(http.MethodPost, signInURL, apperror.Middleware(h.SignIn))
 }
 
-// SignIn returns 200 if ok else 400 + Token
+// Sign in
+// @Summary Sign in/sign up endpoint
+// @Tags Auth
+// @Success 201
+// @Failure 400
+// @Router 1/api/auth/sign-in [post]
 func (h *Handler) SignIn(w http.ResponseWriter, r *http.Request) error {
 	// HEADER, BODY etc.
 	h.Logger.Println("POST SIGN IN")
