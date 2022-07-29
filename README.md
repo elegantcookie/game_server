@@ -13,9 +13,14 @@ port: 10001
 endpoints:
 <ul>
     <div>
-    <li>POST /api/auth/sign-in</li>
-    takes json, payload: username, password    
-</div>
+        <li>POST /api/auth/sign-in</li>
+        takes json, payload: username, password
+    </div>
+    <br>
+    <div>
+        <li>GET /swagger</li>
+        auth-service documentation
+    </div>
 </ul>
 </div>
 
