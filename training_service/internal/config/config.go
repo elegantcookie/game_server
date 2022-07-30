@@ -13,19 +13,14 @@ type Config struct {
 		SocketFile string `env:"SOCKET_FILE" env-default:"app.sock"`
 		Type       string `env:"LISTEN_TYPE" env-default:"port"`
 		BindIP     string `env:"BIND_IP" env-default:"0.0.0.0"`
-		Port       string `env:"PORT" env-default:"10002"`
+		Port       string `env:"PORT" env-default:"10000"`
 	}
 	AppConfig struct {
-		LogLevel string `env:"LOG_LEVEL" env-default:"trace"`
-	}
-	MongoDB struct {
-		Host     string `env:"HOST" env-default:"localhost"`
-		Port     string `env:"PORT" env-default:"27017"`
-		Username string `env:"ADMIN_USERNAME"`
-		Password string `env:"ADMIN_PASSWORD"`
-
-		Database string `env:"DATABASE" env-default:"user-service"`
-		AuthDB   string `env:"AUTH_DB"`
+		LogLevel  string `env:"LOG_LEVEL" env-default:"trace"`
+		AdminUser struct {
+			Email    string `env:"ADMIN_EMAIL" env-default:"admin"`
+			Password string `env:"ADMIN_PWD" env-default:"admin"`
+		}
 	}
 }
 
