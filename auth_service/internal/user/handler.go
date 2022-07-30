@@ -3,7 +3,6 @@ package user
 import (
 	"auth_service/internal/apperror"
 	"auth_service/pkg/logging"
-	"encoding/json"
 	"fmt"
 	"github.com/julienschmidt/httprouter"
 	"net/http"
@@ -32,17 +31,13 @@ func (h *Handler) SignIn(w http.ResponseWriter, r *http.Request) error {
 	// HEADER, BODY etc.
 	h.Logger.Println("POST SIGN IN")
 	w.Header().Set("Content-Type", "application/json")
+
 	token, err := h.AuthService.SignIn(r.Context(), r.Body)
 	if err != nil {
 		return err
 	}
 	w.Header().Set("Location", fmt.Sprintf("%s", signInURL))
-	payload := map[string]string{"token": token}
-	userBytes, err := json.Marshal(payload)
-	if err != nil {
-		return err
-	}
-	w.Write(userBytes)
+	w.Header().Add("Authorization", fmt.Sprintf("Bearer %s", token))
 	w.WriteHeader(http.StatusCreated)
 	return nil
 }

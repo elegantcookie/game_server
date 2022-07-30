@@ -9,7 +9,7 @@ import (
 func CreateToken(cfg *config.Config, userId string) (string, error) {
 
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.RegisteredClaims{
-		Subject:   userId,
+		ID:        userId,
 		ExpiresAt: &jwt.NumericDate{Time: time.Now().Add(5 * time.Hour)},
 	})
 	return token.SignedString([]byte(cfg.Keys.JWTSignKey))
