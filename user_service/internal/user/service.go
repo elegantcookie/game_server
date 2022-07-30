@@ -55,7 +55,7 @@ func (s service) Create(ctx context.Context, dto CreateUserDTO) (userID string, 
 	return userID, nil
 }
 
-// GetOne user by id
+// GetById gets user by idd
 func (s service) GetById(ctx context.Context, id string) (u User, err error) {
 	u, err = s.storage.FindById(ctx, id)
 
