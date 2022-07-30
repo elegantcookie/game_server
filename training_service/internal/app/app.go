@@ -1,9 +1,6 @@
 package app
 
 import (
-	"api_gateway/internal/config"
-	"api_gateway/pkg/logging"
-	"api_gateway/pkg/metrics"
 	"context"
 	"errors"
 	"fmt"
@@ -16,6 +13,12 @@ import (
 	"path"
 	"path/filepath"
 	"time"
+	"training_service/internal/config"
+	"training_service/internal/table"
+	"training_service/internal/table/db"
+	"training_service/pkg/client/mongodb"
+	"training_service/pkg/logging"
+	"training_service/pkg/metrics"
 )
 
 type App struct {
@@ -25,7 +28,7 @@ type App struct {
 	httpServer *http.Server
 }
 
-func NewApp(config *config.Config, logger *logging.Logger) (App, error) {
+func NewApp(cfg *config.Config, logger *logging.Logger) (App, error) {
 	logger.Println("router initializing")
 	router := httprouter.New()
 
@@ -37,8 +40,26 @@ func NewApp(config *config.Config, logger *logging.Logger) (App, error) {
 	metricHandler := metrics.Handler{}
 	metricHandler.Register(router)
 
+	mongodbClient, err := mongodb.NewClient(context.Background(), cfg.MongoDB.Host, cfg.MongoDB.Port,
+		cfg.MongoDB.Username, cfg.MongoDB.Password, cfg.MongoDB.Database, cfg.MongoDB.AuthDB)
+	if err != nil {
+		panic(err)
+	}
+
+	storage := db.NewStorage(mongodbClient, logger)
+	service, err := table.NewService(storage, *logger)
+	if err != nil {
+		panic(err)
+	}
+
+	usersHandler := table.Handler{
+		Logger:          logging.GetLogger(cfg.AppConfig.LogLevel),
+		TrainingService: service,
+	}
+	usersHandler.Register(router)
+
 	return App{
-		config,
+		cfg,
 		logger,
 		router,
 		nil,

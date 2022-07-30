@@ -1,0 +1,110 @@
+info:
+  contact: {}
+paths:
+  /api/training:
+    delete:
+      consumes:
+      - application/json
+      produces:
+      - application/json
+      responses:
+        "204":
+          description: ""
+        "400":
+          description: ""
+      summary: Delete record by record id
+      tags:
+      - Records
+    patch:
+      consumes:
+      - application/json
+      produces:
+      - application/json
+      responses:
+        "204":
+          description: ""
+        "400":
+          description: ""
+      summary: Partially update record by user id
+      tags:
+      - Records
+    post:
+      consumes:
+      - application/json
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: ""
+        "400":
+          description: ""
+      summary: Create record endpoint
+      tags:
+      - Records
+  /api/training/collections/get/all:
+    get:
+      consumes:
+      - application/json
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: ""
+        "400":
+          description: ""
+      summary: Get collection names of "training-service" db
+      tags:
+      - Records
+  /api/training/get/all:
+    post:
+      consumes:
+      - application/json
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: ""
+        "400":
+          description: ""
+      summary: Get all records of a table
+      tags:
+      - Records
+  /api/training/get/id:
+    post:
+      consumes:
+      - application/json
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: ""
+        "400":
+          description: ""
+      summary: Get record by record id
+      tags:
+      - Records
+  /api/training/get/userid:
+    post:
+      consumes:
+      - application/json
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: ""
+        "400":
+          description: ""
+      summary: Get record by user id
+      tags:
+      - Records
+  /userapi/heartbeat:
+    get:
+      responses:
+        "204":
+          description: ""
+        "400":
+          description: ""
+      summary: Heartbeat metric
+      tags:
+      - Metrics
+swagger: "2.0"

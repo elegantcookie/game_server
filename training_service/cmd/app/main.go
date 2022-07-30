@@ -1,10 +1,11 @@
 package main
 
 import (
-	"api_gateway/internal/app"
-	"api_gateway/internal/config"
-	"api_gateway/pkg/logging"
 	"log"
+	_ "training_service/docs"
+	"training_service/internal/app"
+	"training_service/internal/config"
+	"training_service/pkg/logging"
 )
 
 func main() {
