@@ -23,7 +23,6 @@ type Config struct {
 		Port     string `env:"PORT" env-default:"27017"`
 		Username string `env:"ADMIN_USERNAME"`
 		Password string `env:"ADMIN_PASSWORD"`
-
 		Database string `env:"DATABASE" env-default:"user-service"`
 		AuthDB   string `env:"AUTH_DB"`
 	}
