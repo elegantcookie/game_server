@@ -41,6 +41,33 @@ paths:
       summary: Create record endpoint
       tags:
       - Records
+  /api/training/collections:
+    delete:
+      consumes:
+      - application/json
+      produces:
+      - application/json
+      responses:
+        "204":
+          description: ""
+        "400":
+          description: ""
+      summary: Delete collection by collection name(table_name). Needs accept token
+      tags:
+      - Collections
+    post:
+      consumes:
+      - application/json
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: ""
+        "400":
+          description: ""
+      summary: Create collection endpoint. Needs accept token
+      tags:
+      - Collections
   /api/training/collections/get/all:
     get:
       consumes:

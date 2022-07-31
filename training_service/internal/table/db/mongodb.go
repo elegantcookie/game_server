@@ -7,6 +7,7 @@ import (
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
+	"training_service/internal/config"
 	"training_service/internal/table"
 	"training_service/pkg/logging"
 )
@@ -28,6 +29,62 @@ func (d *db) IsCollection(ctx context.Context, collectionName string) (bool, err
 	}
 	return false, nil
 
+}
+
+func (d *db) CreateCollection(ctx context.Context, dto table.CollectionDTO) error {
+	d.logger.Debug("CREATE COLLECTION")
+	if dto.AccessKey != config.GetConfig().Keys.AccessKey {
+		return fmt.Errorf("wrong access key")
+	}
+	collectionName := dto.Name
+	if collectionName == "" {
+		return fmt.Errorf("collection name can't be empty")
+	}
+	isCollection, err := d.IsCollection(ctx, collectionName)
+	if err != nil {
+		return err
+	}
+	if isCollection {
+		return fmt.Errorf("collection with name: %s already exists", collectionName)
+	}
+	collection := d.database.Collection(collectionName)
+
+	// COLLECTION CREATES ONLY IF SOMETHING IS INSERTED THERE
+	_, err = collection.InsertOne(ctx, table.RecordDTO{
+		TableName: dto.Name,
+		ID:        "-1",
+		UserID:    "-1",
+		UserScore: "-1",
+	})
+	if err != nil {
+		return err
+	}
+	_, err = collection.DeleteOne(ctx, bson.M{})
+	if err != nil {
+		return err
+	}
+	d.logger.Printf("new collection name: %s", collection.Name())
+	return nil
+}
+
+func (d *db) DeleteCollectionByName(ctx context.Context, dto table.CollectionDTO) error {
+	d.logger.Debug("DELETE COLLECTION")
+	if dto.AccessKey != config.GetConfig().Keys.AccessKey {
+		return fmt.Errorf("wrong access key")
+	}
+	collectionName := dto.Name
+	if collectionName == "" {
+		return fmt.Errorf("collection name can't be empty")
+	}
+	isCollection, err := d.IsCollection(ctx, collectionName)
+	if err != nil {
+		return err
+	}
+	if !isCollection {
+		return fmt.Errorf("collection with name: %s doesn't exists", collectionName)
+	}
+	d.database.Collection(collectionName).Drop(ctx)
+	return nil
 }
 
 func (d *db) Create(ctx context.Context, dto table.RecordDTO) (string, error) {
