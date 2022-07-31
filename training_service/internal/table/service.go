@@ -24,12 +24,24 @@ func NewService(userStorage Storage, logger logging.Logger) (Service, error) {
 
 type Service interface {
 	Create(ctx context.Context, dto RecordDTO) (string, error)
+	CreateCollection(ctx context.Context, dto CollectionDTO) error
+	DeleteCollection(ctx context.Context, dto CollectionDTO) error
 	GetAll(ctx context.Context, dto RecordDTO) ([]Record, error)
 	GetCollectionNames(ctx context.Context) ([]Collection, error)
 	GetById(ctx context.Context, dto RecordDTO) (Record, error)
 	GetByUserId(ctx context.Context, dto RecordDTO) (u Record, err error)
 	Update(ctx context.Context, dto RecordDTO) error
 	Delete(ctx context.Context, dto RecordDTO) error
+}
+
+func (s service) CreateCollection(ctx context.Context, dto CollectionDTO) error {
+	s.logger.Debug("create collection")
+
+	err := s.storage.CreateCollection(ctx, dto)
+	if err != nil {
+		return fmt.Errorf("failed to create record. error: %w", err)
+	}
+	return nil
 }
 
 func (s service) Create(ctx context.Context, dto RecordDTO) (recordID string, err error) {
@@ -113,4 +125,14 @@ func (s service) Delete(ctx context.Context, dto RecordDTO) error {
 		return fmt.Errorf("failed to delete record. error: %w", err)
 	}
 	return err
+}
+
+func (s service) DeleteCollection(ctx context.Context, dto CollectionDTO) error {
+	s.logger.Debug("delete collection")
+
+	err := s.storage.DeleteCollectionByName(ctx, dto)
+	if err != nil {
+		return fmt.Errorf("failed to delete record. error: %w", err)
+	}
+	return nil
 }

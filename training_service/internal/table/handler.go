@@ -15,7 +15,8 @@ var (
 	getAllRecordsUrl     = "/api/training/get/all"
 	getRecordUrl         = "/api/training/get/id"
 	getRecordByUserIDUrl = "/api/training/get/userid"
-	collectionsUrl       = "/api/training/collections/get/all"
+	getAllCollectionsUrl = "/api/training/collections/get/all"
+	collectionsUrl       = "/api/training/collections/"
 )
 
 type Handler struct {
@@ -28,9 +29,11 @@ func (h *Handler) Register(router *httprouter.Router) {
 	router.HandlerFunc(http.MethodPost, getRecordUrl, auth.Middleware(h.GetRecordById))
 	router.HandlerFunc(http.MethodPost, getRecordByUserIDUrl, auth.Middleware(h.GetRecordByUserId))
 	router.HandlerFunc(http.MethodPost, getAllRecordsUrl, auth.Middleware(h.GetRecords))
-	router.HandlerFunc(http.MethodGet, collectionsUrl, auth.Middleware(h.GetCollectionNames))
+	router.HandlerFunc(http.MethodGet, getAllCollectionsUrl, auth.Middleware(h.GetCollectionNames))
 	router.HandlerFunc(http.MethodDelete, recordsUrl, auth.Middleware(h.DeleteRecord))
 	router.HandlerFunc(http.MethodPatch, recordsUrl, auth.Middleware(h.PartiallyUpdateRecord))
+	router.HandlerFunc(http.MethodPost, collectionsUrl, auth.Middleware(h.CreateCollection))
+	router.HandlerFunc(http.MethodDelete, collectionsUrl, auth.Middleware(h.DeleteCollectionByName))
 }
 
 // Create record
@@ -247,6 +250,59 @@ func (h *Handler) DeleteRecord(w http.ResponseWriter, r *http.Request) error {
 	}
 
 	err = h.TrainingService.Delete(r.Context(), dto)
+	if err != nil {
+		return err
+	}
+	w.WriteHeader(http.StatusNoContent)
+
+	return nil
+}
+
+// Create collection
+// @Summary Create collection endpoint. Needs accept token
+// @Accept json
+// @Produce json
+// @Tags Collections
+// @Success 201
+// @Failure 400
+// @Router /api/training/collections [post]
+func (h *Handler) CreateCollection(w http.ResponseWriter, r *http.Request) error {
+	h.Logger.Info("POST CREATE COLLECTION")
+	w.Header().Set("Content-Type", "application/json")
+
+	var dto CollectionDTO
+	defer r.Body.Close()
+	err := json.NewDecoder(r.Body).Decode(&dto)
+	if err != nil {
+		return auth.BadRequestError("invalid JSON scheme. check swagger API")
+	}
+	err = h.TrainingService.CreateCollection(context.Background(), dto)
+	if err != nil {
+		return err
+	}
+	w.WriteHeader(http.StatusCreated)
+	return nil
+}
+
+// Delete collection
+// @Summary Delete collection by collection name(table_name). Needs accept token
+// @Accept json
+// @Produce json
+// @Tags Collections
+// @Success 204
+// @Failure 400
+// @Router /api/training/collections [delete]
+func (h *Handler) DeleteCollectionByName(w http.ResponseWriter, r *http.Request) error {
+	h.Logger.Info("DELETE COLLECTION")
+	w.Header().Set("Content-Type", "application/json")
+
+	var dto CollectionDTO
+	err := json.NewDecoder(r.Body).Decode(&dto)
+	if err != nil {
+		return auth.BadRequestError("invalid JSON scheme. check swagger API")
+	}
+
+	err = h.TrainingService.DeleteCollection(r.Context(), dto)
 	if err != nil {
 		return err
 	}
