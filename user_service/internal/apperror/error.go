@@ -5,7 +5,8 @@ import (
 )
 
 var (
-	ErrNotFound = NewAppError(nil, "not found", "NS-000003", "")
+	ErrNotFound   = NewAppError(nil, "not found", "NS-000003", "")
+	ErrWrongToken = NewAppError(nil, "wrong token", "NS-000004", "")
 )
 
 type AppError struct {

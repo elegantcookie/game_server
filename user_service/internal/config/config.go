@@ -26,6 +26,9 @@ type Config struct {
 		Database string `env:"DATABASE" env-default:"user-service"`
 		AuthDB   string `env:"AUTH_DB"`
 	}
+	Keys struct {
+		JWTSignKey string `env:"JWT_SIGN_KEY" env-default:"alsfjak12h4i1h2uas7f7241231o1u2io5u12asopua0w9812"`
+	}
 }
 
 var instance *Config
