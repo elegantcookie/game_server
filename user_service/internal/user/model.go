@@ -6,9 +6,15 @@ import (
 )
 
 type User struct {
-	ID       string `json:"id" bson:"_id,omitempty"`
-	Username string `json:"username" bson:"username"`
-	Password string `json:"-" bson:"password"`
+	ID       string   `json:"id" bson:"_id,omitempty"`
+	Username string   `json:"username" bson:"username"`
+	Password string   `json:"-" bson:"password"`
+	Tickets  []string `json:"tickets" bson:"tickets"`
+}
+
+type TicketDTO struct {
+	ID       string `json:"id"`
+	TicketID string `json:"ticket_id"`
 }
 
 type CreateUserDTO struct {
@@ -16,12 +22,11 @@ type CreateUserDTO struct {
 	Password string `json:"password"`
 }
 
-//type UpdateUserDTO struct {
-//	ID          string `json:"id,omitempty" bson:"_id,omitempty"`
-//	Password    string `json:"password,omitempty" bson:"password,omitempty"`
-//	OldPassword string `json:"old_password,omitempty" bson:"-"`
-//	NewPassword string `json:"new_password,omitempty" bson:"-"`
-//}
+type UpdateUserDTO struct {
+	ID       string   `json:"id" bson:"_id,omitempty"`
+	Username string   `json:"username" bson:"username"`
+	Tickets  []string `json:"tickets" bson:"tickets"`
+}
 
 func NewUser(dto CreateUserDTO) User {
 	return User{

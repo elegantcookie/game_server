@@ -2,6 +2,7 @@ package main
 
 import (
 	"log"
+	_ "user_service/docs"
 	"user_service/internal/app"
 	"user_service/internal/config"
 	"user_service/pkg/logging"
