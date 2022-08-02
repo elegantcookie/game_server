@@ -11,7 +11,7 @@ import (
 )
 
 var (
-	ticketsUrl       = "/api/tickets/"
+	ticketsUrl       = "/api/tickets"
 	getAllTicketsUrl = "/api/tickets/get/all"
 	getTicketUrl     = "/api/tickets/get/id"
 )
@@ -29,14 +29,14 @@ func (h *Handler) Register(router *httprouter.Router) {
 	router.HandlerFunc(http.MethodPatch, ticketsUrl, auth.Middleware(h.PartiallyUpdateTicket))
 }
 
-// Create record
-// @Summary Create record endpoint
+// Create ticket
+// @Summary Create ticket endpoint
 // @Accept json
 // @Produce json
 // @Tags Tickets
 // @Success 201
 // @Failure 400
-// @Router /api/training [post]
+// @Router /api/tickets [post]
 func (h *Handler) CreateTicket(w http.ResponseWriter, r *http.Request) error {
 	h.Logger.Info("POST CREATE RECORD")
 	w.Header().Set("Content-Type", "application/json")
@@ -62,14 +62,14 @@ func (h *Handler) CreateTicket(w http.ResponseWriter, r *http.Request) error {
 	return nil
 }
 
-// Get record by id
-// @Summary Get record by record id
+// Get ticket by id
+// @Summary Get ticket by ticket id
 // @Accept json
 // @Produce json
 // @Tags Tickets
 // @Success 200
 // @Failure 400
-// @Router /api/training/get/id [post]
+// @Router /api/tickets/get/id [post]
 func (h *Handler) GetTicketById(w http.ResponseWriter, r *http.Request) error {
 	h.Logger.Info("GET RECORD BY ID")
 	w.Header().Set("Content-Type", "application/json")
@@ -97,14 +97,14 @@ func (h *Handler) GetTicketById(w http.ResponseWriter, r *http.Request) error {
 	return nil
 }
 
-// Get records
-// @Summary Get all records of a ticket
+// Get tickets
+// @Summary Get all tickets
 // @Accept json
 // @Produce json
 // @Tags Tickets
 // @Success 200
 // @Failure 400
-// @Router /api/training/get/all [post]
+// @Router /api/tickets/get/all [post]
 func (h *Handler) GetTickets(w http.ResponseWriter, r *http.Request) error {
 	h.Logger.Info("GET RECORDS")
 	w.Header().Set("Content-Type", "application/json")
@@ -126,14 +126,14 @@ func (h *Handler) GetTickets(w http.ResponseWriter, r *http.Request) error {
 	return nil
 }
 
-// Partially update record
-// @Summary Partially update record by user id
+// Partially update ticket
+// @Summary Partially update ticket by user id
 // @Accept json
 // @Produce json
 // @Tags Tickets
 // @Success 204
 // @Failure 400
-// @Router /api/training [patch]
+// @Router /api/tickets [patch]
 func (h *Handler) PartiallyUpdateTicket(w http.ResponseWriter, r *http.Request) error {
 	h.Logger.Info("PARTIALLY UPDATE TICKET")
 	w.Header().Set("Content-Type", "application/json")
@@ -152,14 +152,14 @@ func (h *Handler) PartiallyUpdateTicket(w http.ResponseWriter, r *http.Request) 
 	return nil
 }
 
-// Delete record
-// @Summary Delete record by record id
+// Delete ticket
+// @Summary Delete ticket by ticket id
 // @Accept json
 // @Produce json
 // @Tags Tickets
 // @Success 204
 // @Failure 400
-// @Router /api/training [delete]
+// @Router /api/tickets [delete]
 func (h *Handler) DeleteTicket(w http.ResponseWriter, r *http.Request) error {
 	h.Logger.Info("DELETE TICKET")
 	w.Header().Set("Content-Type", "application/json")

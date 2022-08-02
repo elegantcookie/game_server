@@ -2,6 +2,7 @@ package main
 
 import (
 	"log"
+	_ "ticket_service/docs"
 	"ticket_service/internal/app"
 	"ticket_service/internal/config"
 	"ticket_service/pkg/logging"

@@ -1,0 +1,82 @@
+info:
+  contact: {}
+paths:
+  /api/tickets:
+    delete:
+      consumes:
+      - application/json
+      produces:
+      - application/json
+      responses:
+        "204":
+          description: ""
+        "400":
+          description: ""
+      summary: Delete ticket by ticket id
+      tags:
+      - Tickets
+    patch:
+      consumes:
+      - application/json
+      produces:
+      - application/json
+      responses:
+        "204":
+          description: ""
+        "400":
+          description: ""
+      summary: Partially update ticket by user id
+      tags:
+      - Tickets
+    post:
+      consumes:
+      - application/json
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: ""
+        "400":
+          description: ""
+      summary: Create ticket endpoint
+      tags:
+      - Tickets
+  /api/tickets/get/all:
+    post:
+      consumes:
+      - application/json
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: ""
+        "400":
+          description: ""
+      summary: Get all tickets
+      tags:
+      - Tickets
+  /api/tickets/get/id:
+    post:
+      consumes:
+      - application/json
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: ""
+        "400":
+          description: ""
+      summary: Get ticket by ticket id
+      tags:
+      - Tickets
+  /userapi/heartbeat:
+    get:
+      responses:
+        "204":
+          description: ""
+        "400":
+          description: ""
+      summary: Heartbeat metric
+      tags:
+      - Metrics
+swagger: "2.0"
