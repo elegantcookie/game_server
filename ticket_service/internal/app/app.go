@@ -13,8 +13,8 @@ import (
 	"path"
 	"path/filepath"
 	"ticket_service/internal/config"
-	"ticket_service/internal/table"
-	"ticket_service/internal/table/db"
+	"ticket_service/internal/ticket"
+	"ticket_service/internal/ticket/db"
 	"ticket_service/pkg/client/mongodb"
 	"ticket_service/pkg/logging"
 	"ticket_service/pkg/metrics"
@@ -46,15 +46,15 @@ func NewApp(cfg *config.Config, logger *logging.Logger) (App, error) {
 		panic(err)
 	}
 
-	storage := db.NewStorage(mongodbClient, logger)
-	service, err := table.NewService(storage, *logger)
+	storage := db.NewStorage(mongodbClient, "tickets", logger)
+	service, err := ticket.NewService(storage, *logger)
 	if err != nil {
 		panic(err)
 	}
 
-	usersHandler := table.Handler{
-		Logger:          logging.GetLogger(cfg.AppConfig.LogLevel),
-		TrainingService: service,
+	usersHandler := ticket.Handler{
+		Logger:        logging.GetLogger(cfg.AppConfig.LogLevel),
+		TicketService: service,
 	}
 	usersHandler.Register(router)
 

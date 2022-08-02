@@ -4,7 +4,7 @@ import (
 	"crypto/rsa"
 	"fmt"
 	"github.com/golang-jwt/jwt/v4"
-	"training_service/internal/config"
+	"ticket_service/internal/config"
 )
 
 var signKey *rsa.PrivateKey

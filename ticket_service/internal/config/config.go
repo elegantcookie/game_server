@@ -13,7 +13,7 @@ type Config struct {
 		SocketFile string `env:"SOCKET_FILE" env-default:"app.sock"`
 		Type       string `env:"LISTEN_TYPE" env-default:"port"`
 		BindIP     string `env:"BIND_IP" env-default:"0.0.0.0"`
-		Port       string `env:"PORT" env-default:"10003"`
+		Port       string `env:"PORT" env-default:"10004"`
 	}
 	AppConfig struct {
 		LogLevel  string `env:"LOG_LEVEL" env-default:"trace"`
@@ -28,7 +28,8 @@ type Config struct {
 		Port     string `env:"PORT" env-default:"27017"`
 		Username string `env:"ADMIN_USERNAME"`
 		Password string `env:"ADMIN_PASSWORD"`
-		Database string `env:"DATABASE" env-default:"training-service"`
+
+		Database string `env:"DATABASE" env-default:"ticket-service"`
 		AuthDB   string `env:"AUTH_DB"`
 	}
 	Keys struct {

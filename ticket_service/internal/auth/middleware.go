@@ -5,7 +5,7 @@ import (
 	"log"
 	"net/http"
 	"strings"
-	jwt_setup "training_service/pkg/jwt-setup"
+	jwt_setup "ticket_service/pkg/jwt-setup"
 )
 
 type appHandler func(http.ResponseWriter, *http.Request) error

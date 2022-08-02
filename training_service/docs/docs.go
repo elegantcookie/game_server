@@ -153,7 +153,7 @@ const docTemplate = `{
                 "tags": [
                     "Records"
                 ],
-                "summary": "Get all records of a table",
+                "summary": "Get all records of a ticket",
                 "responses": {
                     "200": {
                         "description": ""
