@@ -93,7 +93,7 @@ paths:
           description: ""
         "400":
           description: ""
-      summary: Get all records of a table
+      summary: Get all records of a ticket
       tags:
       - Records
   /api/training/get/id:

@@ -16,7 +16,7 @@ const docTemplate = `{
     "host": "{{.Host}}",
     "basePath": "{{.BasePath}}",
     "paths": {
-        "/api/training": {
+        "/api/tickets": {
             "post": {
                 "consumes": [
                     "application/json"
@@ -25,9 +25,9 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "Records"
+                    "Tickets"
                 ],
-                "summary": "Create record endpoint",
+                "summary": "Create ticket endpoint",
                 "responses": {
                     "201": {
                         "description": ""
@@ -45,9 +45,9 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "Records"
+                    "Tickets"
                 ],
-                "summary": "Delete record by record id",
+                "summary": "Delete ticket by ticket id",
                 "responses": {
                     "204": {
                         "description": ""
@@ -65,9 +65,9 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "Records"
+                    "Tickets"
                 ],
-                "summary": "Partially update record by user id",
+                "summary": "Partially update ticket by user id",
                 "responses": {
                     "204": {
                         "description": ""
@@ -78,7 +78,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/api/training/collections": {
+        "/api/tickets/get/all": {
             "post": {
                 "consumes": [
                     "application/json"
@@ -87,51 +87,9 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "Collections"
+                    "Tickets"
                 ],
-                "summary": "Create collection endpoint. Needs accept token",
-                "responses": {
-                    "201": {
-                        "description": ""
-                    },
-                    "400": {
-                        "description": ""
-                    }
-                }
-            },
-            "delete": {
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "Collections"
-                ],
-                "summary": "Delete collection by collection name(table_name). Needs accept token",
-                "responses": {
-                    "204": {
-                        "description": ""
-                    },
-                    "400": {
-                        "description": ""
-                    }
-                }
-            }
-        },
-        "/api/training/collections/get/all": {
-            "get": {
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "Records"
-                ],
-                "summary": "Get collection names of \"training-service\" db",
+                "summary": "Get all tickets",
                 "responses": {
                     "200": {
                         "description": ""
@@ -142,7 +100,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/api/training/get/all": {
+        "/api/tickets/get/id": {
             "post": {
                 "consumes": [
                     "application/json"
@@ -151,53 +109,9 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "Records"
+                    "Tickets"
                 ],
-                "summary": "Get all records of a ticket",
-                "responses": {
-                    "200": {
-                        "description": ""
-                    },
-                    "400": {
-                        "description": ""
-                    }
-                }
-            }
-        },
-        "/api/training/get/id": {
-            "post": {
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "Records"
-                ],
-                "summary": "Get record by record id",
-                "responses": {
-                    "200": {
-                        "description": ""
-                    },
-                    "400": {
-                        "description": ""
-                    }
-                }
-            }
-        },
-        "/api/training/get/userid": {
-            "post": {
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "Records"
-                ],
-                "summary": "Get record by user id",
+                "summary": "Get ticket by ticket id",
                 "responses": {
                     "200": {
                         "description": ""

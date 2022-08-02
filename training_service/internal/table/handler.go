@@ -140,7 +140,7 @@ func (h *Handler) GetRecordByUserId(w http.ResponseWriter, r *http.Request) erro
 }
 
 // Get records
-// @Summary Get all records of a table
+// @Summary Get all records of a ticket
 // @Accept json
 // @Produce json
 // @Tags Records
