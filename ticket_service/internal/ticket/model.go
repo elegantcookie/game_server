@@ -19,3 +19,8 @@ type TicketDTO struct {
 type TicketIDDTO struct {
 	ID string `json:"id"`
 }
+
+type FreeTicketStatusDTO struct {
+	Status    bool   `json:"tickets_available"`
+	AccessKey string `json:"access_key"`
+}

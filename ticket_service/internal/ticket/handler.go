@@ -11,10 +11,12 @@ import (
 )
 
 var (
-	ticketsUrl         = "/api/tickets"
-	getAllTicketsUrl   = "/api/tickets/get/all"
-	getTicketUrl       = "/api/tickets/get/id"
-	getTicketStatusURL = "/api/tickets/get/status/id"
+	ticketsUrl             = "/api/tickets"
+	getAllTicketsUrl       = "/api/tickets/get/all"
+	getTicketUrl           = "/api/tickets/get/id"
+	getTicketStatusURL     = "/api/tickets/get/status/id"
+	getFreeTicketStatusURL = "/api/tickets/free/get/status"
+	setFreeTicketStatusURL = "/api/tickets/free/set/status"
 )
 
 type Handler struct {
@@ -29,6 +31,8 @@ func (h *Handler) Register(router *httprouter.Router) {
 	router.HandlerFunc(http.MethodDelete, ticketsUrl, auth.Middleware(h.DeleteTicket))
 	router.HandlerFunc(http.MethodPatch, ticketsUrl, auth.Middleware(h.PartiallyUpdateTicket))
 	router.HandlerFunc(http.MethodPost, getTicketStatusURL, auth.Middleware(h.GetTicketStatusById))
+	router.HandlerFunc(http.MethodPost, setFreeTicketStatusURL, auth.Middleware(h.SetFreeTicketStatus))
+	router.HandlerFunc(http.MethodPost, getFreeTicketStatusURL, auth.Middleware(h.GetFreeTicketStatus))
 }
 
 // Create ticket
@@ -215,5 +219,54 @@ func (h *Handler) DeleteTicket(w http.ResponseWriter, r *http.Request) error {
 	}
 	w.WriteHeader(http.StatusNoContent)
 
+	return nil
+}
+
+// Set free ticket status
+// @Summary Set free ticket status endpoint. Requires authorization and access key
+// @Accept json
+// @Produce json
+// @Tags FreeTickets
+// @Success 200
+// @Failure 400
+// @Router /api/tickets/free/set/status [post]
+func (h *Handler) SetFreeTicketStatus(w http.ResponseWriter, r *http.Request) error {
+	w.Header().Set("Content-Type", "application/json")
+
+	var dto FreeTicketStatusDTO
+	defer r.Body.Close()
+	err := json.NewDecoder(r.Body).Decode(&dto)
+	if err != nil {
+		return auth.BadRequestError("invalid JSON scheme. check swagger API")
+	}
+	err = h.TicketService.SetFreeTicketStatus(dto)
+	if err != nil {
+		return err
+	}
+	w.WriteHeader(http.StatusOK)
+	return nil
+}
+
+// Get free ticket status
+// @Summary Get free ticket status endpoint. Requires authorization
+// @Accept json
+// @Produce json
+// @Tags FreeTickets
+// @Success 200
+// @Failure 400
+// @Router /api/tickets/free/get/status [post]
+func (h *Handler) GetFreeTicketStatus(w http.ResponseWriter, r *http.Request) error {
+	w.Header().Set("Content-Type", "application/json")
+
+	status := h.TicketService.GetFreeTicketStatus()
+	statusMap := make(map[string]bool)
+	statusMap["tickets_available"] = status
+
+	userBytes, err := json.Marshal(statusMap)
+	if err != nil {
+		return fmt.Errorf("failed to marshall ticket status. error: %w", err)
+	}
+	w.WriteHeader(http.StatusOK)
+	w.Write(userBytes)
 	return nil
 }

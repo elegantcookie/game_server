@@ -78,6 +78,50 @@ const docTemplate = `{
                 }
             }
         },
+        "/api/tickets/free/get/status": {
+            "post": {
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "FreeTickets"
+                ],
+                "summary": "Get free ticket status endpoint. Requires authorization",
+                "responses": {
+                    "200": {
+                        "description": ""
+                    },
+                    "400": {
+                        "description": ""
+                    }
+                }
+            }
+        },
+        "/api/tickets/free/set/status": {
+            "post": {
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "FreeTickets"
+                ],
+                "summary": "Set free ticket status endpoint. Requires authorization and access key",
+                "responses": {
+                    "200": {
+                        "description": ""
+                    },
+                    "400": {
+                        "description": ""
+                    }
+                }
+            }
+        },
         "/api/tickets/get/all": {
             "post": {
                 "consumes": [

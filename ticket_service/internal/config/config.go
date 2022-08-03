@@ -36,6 +36,7 @@ type Config struct {
 		AccessKey  string `env:"ACCESS_KEY" env-default:"18d8debd1eec2eb338c4a9a8815633cede19cf3d17b0f20c60cf3839a89699cb"`
 		JWTSignKey string `env:"JWT_SIGN_KEY" env-default:"alsfjak12h4i1h2uas7f7241231o1u2io5u12asopua0w9812"`
 	}
+	TicketsAvailable bool `env:"TICKETS_AVAILABLE" env-default:"true"`
 }
 
 var instance *Config
