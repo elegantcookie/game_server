@@ -11,9 +11,10 @@ import (
 )
 
 var (
-	ticketsUrl       = "/api/tickets"
-	getAllTicketsUrl = "/api/tickets/get/all"
-	getTicketUrl     = "/api/tickets/get/id"
+	ticketsUrl         = "/api/tickets"
+	getAllTicketsUrl   = "/api/tickets/get/all"
+	getTicketUrl       = "/api/tickets/get/id"
+	getTicketStatusURL = "/api/tickets/get/status/id"
 )
 
 type Handler struct {
@@ -27,6 +28,7 @@ func (h *Handler) Register(router *httprouter.Router) {
 	router.HandlerFunc(http.MethodPost, getAllTicketsUrl, auth.Middleware(h.GetTickets))
 	router.HandlerFunc(http.MethodDelete, ticketsUrl, auth.Middleware(h.DeleteTicket))
 	router.HandlerFunc(http.MethodPatch, ticketsUrl, auth.Middleware(h.PartiallyUpdateTicket))
+	router.HandlerFunc(http.MethodPost, getTicketStatusURL, auth.Middleware(h.GetTicketStatusById))
 }
 
 // Create ticket
@@ -38,7 +40,7 @@ func (h *Handler) Register(router *httprouter.Router) {
 // @Failure 400
 // @Router /api/tickets [post]
 func (h *Handler) CreateTicket(w http.ResponseWriter, r *http.Request) error {
-	h.Logger.Info("POST CREATE RECORD")
+	h.Logger.Info("POST CREATE TICKET")
 	w.Header().Set("Content-Type", "application/json")
 
 	var dto TicketDTO
@@ -71,7 +73,7 @@ func (h *Handler) CreateTicket(w http.ResponseWriter, r *http.Request) error {
 // @Failure 400
 // @Router /api/tickets/get/id [post]
 func (h *Handler) GetTicketById(w http.ResponseWriter, r *http.Request) error {
-	h.Logger.Info("GET RECORD BY ID")
+	h.Logger.Info("GET TICKET BY ID")
 	w.Header().Set("Content-Type", "application/json")
 
 	var dto TicketIDDTO
@@ -97,6 +99,43 @@ func (h *Handler) GetTicketById(w http.ResponseWriter, r *http.Request) error {
 	return nil
 }
 
+// Get ticket status
+// @Summary Get ticket status by ticket id
+// @Accept json
+// @Produce json
+// @Tags Tickets
+// @Success 200
+// @Failure 400
+// @Router /api/tickets/get/status/id [post]
+func (h *Handler) GetTicketStatusById(w http.ResponseWriter, r *http.Request) error {
+	h.Logger.Info("GET TICKET STATUS BY ID")
+	w.Header().Set("Content-Type", "application/json")
+
+	var dto TicketIDDTO
+	defer r.Body.Close()
+	err := json.NewDecoder(r.Body).Decode(&dto)
+	if err != nil {
+		return auth.BadRequestError("invalid JSON scheme. check swagger API")
+	}
+
+	user, err := h.TicketService.GetById(r.Context(), dto.ID)
+	if err != nil {
+		return err
+	}
+
+	ticketStatus := make(map[string]bool)
+	ticketStatus["is_active"] = user.IsActive
+
+	userBytes, err := json.Marshal(ticketStatus)
+	if err != nil {
+		return fmt.Errorf("failed to marshall ticket. error: %w", err)
+	}
+
+	w.WriteHeader(http.StatusOK)
+	w.Write(userBytes)
+	return nil
+}
+
 // Get tickets
 // @Summary Get all tickets
 // @Accept json
@@ -106,7 +145,7 @@ func (h *Handler) GetTicketById(w http.ResponseWriter, r *http.Request) error {
 // @Failure 400
 // @Router /api/tickets/get/all [post]
 func (h *Handler) GetTickets(w http.ResponseWriter, r *http.Request) error {
-	h.Logger.Info("GET RECORDS")
+	h.Logger.Info("GET TICKETS")
 	w.Header().Set("Content-Type", "application/json")
 
 	tickets, err := h.TicketService.GetAll(r.Context())

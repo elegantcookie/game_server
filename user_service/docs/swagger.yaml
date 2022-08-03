@@ -109,6 +109,20 @@ paths:
       summary: Add ticket by user id and ticket id
       tags:
       - Tickets
+  /api/users/tickets/free/:id:
+    post:
+      consumes:
+      - application/json
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: ""
+        "400":
+          description: ""
+      summary: Get ticket status
+      tags:
+      - Tickets
   /api/users/username/:username:
     post:
       consumes:

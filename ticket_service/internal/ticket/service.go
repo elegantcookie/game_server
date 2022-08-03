@@ -33,7 +33,7 @@ type Service interface {
 func (s service) Create(ctx context.Context, dto TicketDTO) (ticketID string, err error) {
 	s.logger.Debug("check password")
 	ticket := Ticket{
-		Type:         dto.Type,
+		IsActive:     true,
 		TicketPrice:  dto.TicketPrice,
 		PlayerAmount: dto.PlayerAmount,
 		GameType:     dto.GameType,
