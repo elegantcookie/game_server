@@ -69,6 +69,20 @@ paths:
       summary: Get ticket by ticket id
       tags:
       - Tickets
+  /api/tickets/get/status/id:
+    post:
+      consumes:
+      - application/json
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: ""
+        "400":
+          description: ""
+      summary: Get ticket status by ticket id
+      tags:
+      - Tickets
   /userapi/heartbeat:
     get:
       responses:

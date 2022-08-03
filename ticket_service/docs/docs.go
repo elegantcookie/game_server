@@ -122,6 +122,28 @@ const docTemplate = `{
                 }
             }
         },
+        "/api/tickets/get/status/id": {
+            "post": {
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Tickets"
+                ],
+                "summary": "Get ticket status by ticket id",
+                "responses": {
+                    "200": {
+                        "description": ""
+                    },
+                    "400": {
+                        "description": ""
+                    }
+                }
+            }
+        },
         "/userapi/heartbeat": {
             "get": {
                 "tags": [
