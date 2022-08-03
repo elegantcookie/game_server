@@ -184,6 +184,28 @@ const docTemplate = `{
                 }
             }
         },
+        "/api/users/tickets/free/:id": {
+            "post": {
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Tickets"
+                ],
+                "summary": "Get ticket status",
+                "responses": {
+                    "200": {
+                        "description": ""
+                    },
+                    "400": {
+                        "description": ""
+                    }
+                }
+            }
+        },
         "/api/users/username/:username": {
             "post": {
                 "consumes": [
