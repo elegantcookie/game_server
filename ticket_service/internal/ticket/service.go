@@ -5,6 +5,7 @@ import (
 	"errors"
 	"fmt"
 	"ticket_service/internal/auth"
+	"ticket_service/internal/config"
 	"ticket_service/pkg/logging"
 )
 
@@ -28,6 +29,8 @@ type Service interface {
 	GetById(ctx context.Context, id string) (Ticket, error)
 	Update(ctx context.Context, dto Ticket) error
 	Delete(ctx context.Context, id string) error
+	SetFreeTicketStatus(dto FreeTicketStatusDTO) error
+	GetFreeTicketStatus() bool
 }
 
 func (s service) Create(ctx context.Context, dto TicketDTO) (ticketID string, err error) {
@@ -92,4 +95,17 @@ func (s service) Delete(ctx context.Context, id string) error {
 		return fmt.Errorf("failed to delete Ticket. error: %w", err)
 	}
 	return err
+}
+
+func (s service) SetFreeTicketStatus(dto FreeTicketStatusDTO) error {
+	cfg := config.GetConfig()
+	if dto.AccessKey != cfg.Keys.AccessKey {
+		return fmt.Errorf("wrong access key")
+	}
+	cfg.TicketsAvailable = dto.Status
+	return nil
+}
+
+func (s service) GetFreeTicketStatus() bool {
+	return config.GetConfig().TicketsAvailable
 }
