@@ -182,7 +182,6 @@ func (h *Handler) PartiallyUpdateTicket(w http.ResponseWriter, r *http.Request) 
 	if err := json.NewDecoder(r.Body).Decode(&ticket); err != nil {
 		return auth.BadRequestError("invalid JSON scheme. check swagger API")
 	}
-	h.Logger.Printf("Ticket: %v", ticket)
 	err := h.TicketService.Update(r.Context(), ticket)
 	if err != nil {
 		return err
