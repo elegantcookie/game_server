@@ -10,11 +10,12 @@ import (
 )
 
 const (
-	usersURL    = "/api/users"
-	authUrl     = "/api/users/auth"
-	userIdURL   = "/api/users/id/:id"
-	usernameURL = "/api/users/username/:username"
-	ticketsURL  = "/api/users/tickets"
+	usersURL      = "/api/users"
+	authUrl       = "/api/users/auth"
+	userIdURL     = "/api/users/id/:id"
+	usernameURL   = "/api/users/username/:username"
+	ticketsURL    = "/api/users/tickets"
+	freeTicketURL = "/api/users/tickets/free/:id"
 )
 
 type Handler struct {
@@ -32,6 +33,7 @@ func (h *Handler) Register(router *httprouter.Router) {
 	router.HandlerFunc(http.MethodDelete, userIdURL, apperror.AuthMiddleware(h.DeleteUser))
 	router.HandlerFunc(http.MethodPut, ticketsURL, apperror.AuthMiddleware(h.AddTicket))
 	router.HandlerFunc(http.MethodDelete, ticketsURL, apperror.AuthMiddleware(h.DeleteTicket))
+	router.HandlerFunc(http.MethodPost, freeTicketURL, apperror.AuthMiddleware(h.GetFreeTicketStatus))
 }
 
 // Get user by id
@@ -298,5 +300,38 @@ func (h *Handler) DeleteTicket(w http.ResponseWriter, r *http.Request) error {
 	}
 	w.WriteHeader(http.StatusNoContent)
 
+	return nil
+}
+
+// Get ticket status
+// @Summary Get ticket status
+// @Accept json
+// @Produce json
+// @Tags Tickets
+// @Success 200
+// @Failure 400
+// @Router /api/users/tickets/free/:id [post]
+func (h *Handler) GetFreeTicketStatus(w http.ResponseWriter, r *http.Request) error {
+	w.Header().Set("Content-Type", "application/json")
+
+	h.Logger.Debug("get uuid from context")
+	params := r.Context().Value(httprouter.ParamsKey).(httprouter.Params)
+	userUUID := params.ByName("id")
+
+	user, err := h.UserService.GetById(r.Context(), userUUID)
+	if err != nil {
+		return err
+	}
+
+	ticketStatus := make(map[string]bool)
+	ticketStatus["has_ticket"] = user.HasFreeTicket
+
+	userBytes, err := json.Marshal(ticketStatus)
+	if err != nil {
+		return fmt.Errorf("failed to marshall user. error: %w", err)
+	}
+
+	w.WriteHeader(http.StatusOK)
+	w.Write(userBytes)
 	return nil
 }
