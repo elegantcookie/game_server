@@ -154,7 +154,7 @@ func (s service) AddTicket(ctx context.Context, dto TicketDTO) error {
 		return err
 	}
 	if _, isIn := ticketInArray(dto.TicketID, user.Tickets); isIn {
-		return fmt.Errorf("user already has ticket with ID: %s", dto.TicketID)
+		return fmt.Errorf("user already has prize with ID: %s", dto.TicketID)
 	}
 
 	user.Tickets = append(user.Tickets, dto.TicketID)
@@ -182,7 +182,7 @@ func (s service) DeleteTicket(ctx context.Context, dto TicketDTO) error {
 	)
 
 	if index, isIn = ticketInArray(dto.TicketID, user.Tickets); !isIn {
-		return fmt.Errorf("user doesn't have ticket with ID: %s", dto.TicketID)
+		return fmt.Errorf("user doesn't have prize with ID: %s", dto.TicketID)
 	}
 
 	user.Tickets = append(user.Tickets[:index], user.Tickets[index+1:]...)
