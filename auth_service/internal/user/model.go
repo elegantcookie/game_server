@@ -1,9 +1,11 @@
 package user
 
 type User struct {
-	ID       string `json:"id" bson:"_id,omitempty"`
-	Username string `json:"username" bson:"username"`
-	Password string `json:"-" bson:"password"`
+	ID            string   `json:"id" bson:"_id,omitempty"`
+	Username      string   `json:"username" bson:"username"`
+	Password      string   `json:"-" bson:"password"`
+	HasFreeTicket bool     `json:"has_free_ticket" bson:"has_free_ticket"`
+	Tickets       []string `json:"tickets" bson:"tickets"`
 }
 
 type UserDTO struct {
@@ -12,6 +14,8 @@ type UserDTO struct {
 }
 
 type ResponseUserDTO struct {
-	ID       string `json:"id"`
-	Username string `json:"username"`
+	ID            string   `json:"id"`
+	Username      string   `json:"username"`
+	HasFreeTicket bool     `json:"has_free_ticket"`
+	Tickets       []string `json:"tickets"`
 }
