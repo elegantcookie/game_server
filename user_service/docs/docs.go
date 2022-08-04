@@ -153,7 +153,7 @@ const docTemplate = `{
                 "tags": [
                     "Tickets"
                 ],
-                "summary": "Add ticket by user id and ticket id",
+                "summary": "Add prize by user id and prize id",
                 "responses": {
                     "201": {
                         "description": ""
@@ -173,7 +173,7 @@ const docTemplate = `{
                 "tags": [
                     "Tickets"
                 ],
-                "summary": "Delete ticket by user id and ticket id",
+                "summary": "Delete prize by user id and prize id",
                 "responses": {
                     "204": {
                         "description": ""
@@ -195,7 +195,7 @@ const docTemplate = `{
                 "tags": [
                     "Tickets"
                 ],
-                "summary": "Get ticket status",
+                "summary": "Get prize status",
                 "responses": {
                     "200": {
                         "description": ""

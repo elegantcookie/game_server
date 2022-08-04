@@ -47,7 +47,7 @@ func (s service) Create(ctx context.Context, dto TicketDTO) (ticketID string, er
 		if errors.Is(err, auth.ErrNotFound) {
 			return ticketID, err
 		}
-		return ticketID, fmt.Errorf("failed to create ticket. error: %w", err)
+		return ticketID, fmt.Errorf("failed to create prize. error: %w", err)
 	}
 
 	return ticketID, nil

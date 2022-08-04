@@ -35,8 +35,8 @@ func (h *Handler) Register(router *httprouter.Router) {
 	router.HandlerFunc(http.MethodPost, getFreeTicketStatusURL, auth.Middleware(h.GetFreeTicketStatus))
 }
 
-// Create ticket
-// @Summary Create ticket endpoint
+// Create prize
+// @Summary Create prize endpoint
 // @Accept json
 // @Produce json
 // @Tags Tickets
@@ -68,8 +68,8 @@ func (h *Handler) CreateTicket(w http.ResponseWriter, r *http.Request) error {
 	return nil
 }
 
-// Get ticket by id
-// @Summary Get ticket by ticket id
+// Get prize by id
+// @Summary Get prize by prize id
 // @Accept json
 // @Produce json
 // @Tags Tickets
@@ -92,10 +92,10 @@ func (h *Handler) GetTicketById(w http.ResponseWriter, r *http.Request) error {
 		return err
 	}
 
-	h.Logger.Debug("marshal ticket")
+	h.Logger.Debug("marshal prize")
 	userBytes, err := json.Marshal(user)
 	if err != nil {
-		return fmt.Errorf("failed to marshall ticket. error: %w", err)
+		return fmt.Errorf("failed to marshall prize. error: %w", err)
 	}
 
 	w.WriteHeader(http.StatusOK)
@@ -103,8 +103,8 @@ func (h *Handler) GetTicketById(w http.ResponseWriter, r *http.Request) error {
 	return nil
 }
 
-// Get ticket status
-// @Summary Get ticket status by ticket id
+// Get prize status
+// @Summary Get prize status by prize id
 // @Accept json
 // @Produce json
 // @Tags Tickets
@@ -132,7 +132,7 @@ func (h *Handler) GetTicketStatusById(w http.ResponseWriter, r *http.Request) er
 
 	userBytes, err := json.Marshal(ticketStatus)
 	if err != nil {
-		return fmt.Errorf("failed to marshall ticket. error: %w", err)
+		return fmt.Errorf("failed to marshall prize. error: %w", err)
 	}
 
 	w.WriteHeader(http.StatusOK)
@@ -169,8 +169,8 @@ func (h *Handler) GetTickets(w http.ResponseWriter, r *http.Request) error {
 	return nil
 }
 
-// Partially update ticket
-// @Summary Partially update ticket by user id
+// Partially update prize
+// @Summary Partially update prize by user id
 // @Accept json
 // @Produce json
 // @Tags Tickets
@@ -195,8 +195,8 @@ func (h *Handler) PartiallyUpdateTicket(w http.ResponseWriter, r *http.Request) 
 	return nil
 }
 
-// Delete ticket
-// @Summary Delete ticket by ticket id
+// Delete prize
+// @Summary Delete prize by prize id
 // @Accept json
 // @Produce json
 // @Tags Tickets
@@ -222,8 +222,8 @@ func (h *Handler) DeleteTicket(w http.ResponseWriter, r *http.Request) error {
 	return nil
 }
 
-// Set free ticket status
-// @Summary Set free ticket status endpoint. Requires authorization and access key
+// Set free prize status
+// @Summary Set free prize status endpoint. Requires authorization and access key
 // @Accept json
 // @Produce json
 // @Tags FreeTickets
@@ -247,8 +247,8 @@ func (h *Handler) SetFreeTicketStatus(w http.ResponseWriter, r *http.Request) er
 	return nil
 }
 
-// Get free ticket status
-// @Summary Get free ticket status endpoint. Requires authorization
+// Get free prize status
+// @Summary Get free prize status endpoint. Requires authorization
 // @Accept json
 // @Produce json
 // @Tags FreeTickets
@@ -264,7 +264,7 @@ func (h *Handler) GetFreeTicketStatus(w http.ResponseWriter, r *http.Request) er
 
 	userBytes, err := json.Marshal(statusMap)
 	if err != nil {
-		return fmt.Errorf("failed to marshall ticket status. error: %w", err)
+		return fmt.Errorf("failed to marshall prize status. error: %w", err)
 	}
 	w.WriteHeader(http.StatusOK)
 	w.Write(userBytes)

@@ -1,20 +1,7 @@
 info:
   contact: {}
 paths:
-  /api/tickets:
-    delete:
-      consumes:
-      - application/json
-      produces:
-      - application/json
-      responses:
-        "204":
-          description: ""
-        "400":
-          description: ""
-      summary: Delete prize by prize id
-      tags:
-      - Tickets
+  /api/prizes:
     patch:
       consumes:
       - application/json
@@ -25,9 +12,9 @@ paths:
           description: ""
         "400":
           description: ""
-      summary: Partially update prize by user id
+      summary: Partially update prize by prize id
       tags:
-      - Tickets
+      - Prizes
     post:
       consumes:
       - application/json
@@ -40,8 +27,8 @@ paths:
           description: ""
       summary: Create prize endpoint
       tags:
-      - Tickets
-  /api/tickets/free/get/status:
+      - Prizes
+  /api/prizes/all:
     post:
       consumes:
       - application/json
@@ -52,38 +39,23 @@ paths:
           description: ""
         "400":
           description: ""
-      summary: Get free prize status endpoint. Requires authorization
+      summary: Get all prizes
       tags:
-      - FreeTickets
-  /api/tickets/free/set/status:
-    post:
+      - Prizes
+  /api/prizes/id/:id:
+    delete:
       consumes:
       - application/json
       produces:
       - application/json
       responses:
-        "200":
+        "204":
           description: ""
         "400":
           description: ""
-      summary: Set free prize status endpoint. Requires authorization and access key
+      summary: Delete prize by prize id
       tags:
-      - FreeTickets
-  /api/tickets/get/all:
-    post:
-      consumes:
-      - application/json
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: ""
-        "400":
-          description: ""
-      summary: Get all tickets
-      tags:
-      - Tickets
-  /api/tickets/get/id:
+      - Prizes
     post:
       consumes:
       - application/json
@@ -96,21 +68,7 @@ paths:
           description: ""
       summary: Get prize by prize id
       tags:
-      - Tickets
-  /api/tickets/get/status/id:
-    post:
-      consumes:
-      - application/json
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: ""
-        "400":
-          description: ""
-      summary: Get prize status by prize id
-      tags:
-      - Tickets
+      - Prizes
   /userapi/heartbeat:
     get:
       responses:

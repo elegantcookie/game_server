@@ -27,7 +27,7 @@ const docTemplate = `{
                 "tags": [
                     "Tickets"
                 ],
-                "summary": "Create ticket endpoint",
+                "summary": "Create prize endpoint",
                 "responses": {
                     "201": {
                         "description": ""
@@ -47,7 +47,7 @@ const docTemplate = `{
                 "tags": [
                     "Tickets"
                 ],
-                "summary": "Delete ticket by ticket id",
+                "summary": "Delete prize by prize id",
                 "responses": {
                     "204": {
                         "description": ""
@@ -67,7 +67,7 @@ const docTemplate = `{
                 "tags": [
                     "Tickets"
                 ],
-                "summary": "Partially update ticket by user id",
+                "summary": "Partially update prize by user id",
                 "responses": {
                     "204": {
                         "description": ""
@@ -89,7 +89,7 @@ const docTemplate = `{
                 "tags": [
                     "FreeTickets"
                 ],
-                "summary": "Get free ticket status endpoint. Requires authorization",
+                "summary": "Get free prize status endpoint. Requires authorization",
                 "responses": {
                     "200": {
                         "description": ""
@@ -111,7 +111,7 @@ const docTemplate = `{
                 "tags": [
                     "FreeTickets"
                 ],
-                "summary": "Set free ticket status endpoint. Requires authorization and access key",
+                "summary": "Set free prize status endpoint. Requires authorization and access key",
                 "responses": {
                     "200": {
                         "description": ""
@@ -155,7 +155,7 @@ const docTemplate = `{
                 "tags": [
                     "Tickets"
                 ],
-                "summary": "Get ticket by ticket id",
+                "summary": "Get prize by prize id",
                 "responses": {
                     "200": {
                         "description": ""
@@ -177,7 +177,7 @@ const docTemplate = `{
                 "tags": [
                     "Tickets"
                 ],
-                "summary": "Get ticket status by ticket id",
+                "summary": "Get prize status by prize id",
                 "responses": {
                     "200": {
                         "description": ""

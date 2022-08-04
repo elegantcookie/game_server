@@ -7,8 +7,8 @@ import (
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
-	"ticket_service/internal/ticket"
-	"ticket_service/pkg/logging"
+	"prize_service/internal/prize"
+	"prize_service/pkg/logging"
 )
 
 type db struct {
@@ -16,8 +16,8 @@ type db struct {
 	logger     *logging.Logger
 }
 
-func (d *db) Create(ctx context.Context, ticket ticket.Ticket) (string, error) {
-	result, err := d.collection.InsertOne(ctx, ticket)
+func (d *db) Create(ctx context.Context, prize prize.Prize) (string, error) {
+	result, err := d.collection.InsertOne(ctx, prize)
 	if err != nil {
 		return "", fmt.Errorf("failed to create prize due to: %v", err)
 	}
@@ -26,15 +26,15 @@ func (d *db) Create(ctx context.Context, ticket ticket.Ticket) (string, error) {
 	if ok {
 		return oid.Hex(), nil
 	}
-	d.logger.Trace(ticket)
+	d.logger.Trace(prize)
 	return "", fmt.Errorf("failed to convert objectId to hex. probable oid: %s", oid)
 }
 
 // FindById find prize by ticketID
-func (d *db) FindById(ctx context.Context, id string) (ticket ticket.Ticket, err error) {
+func (d *db) FindById(ctx context.Context, id string) (prize prize.Prize, err error) {
 	oid, err := primitive.ObjectIDFromHex(id)
 	if err != nil {
-		return ticket, fmt.Errorf("failed to convert hex to objectID, hex: %s", id)
+		return prize, fmt.Errorf("failed to convert hex to objectID, hex: %s", id)
 	}
 	filter := bson.M{"_id": oid}
 	result := d.collection.FindOne(ctx, filter)
@@ -42,15 +42,15 @@ func (d *db) FindById(ctx context.Context, id string) (ticket ticket.Ticket, err
 		if errors.Is(result.Err(), mongo.ErrNoDocuments) {
 			// TODO ErrEntityNotFound
 		}
-		return ticket, fmt.Errorf("failed to find prize by id: %s due to error: %v", id, result.Err())
+		return prize, fmt.Errorf("failed to find prize by id: %s due to error: %v", id, result.Err())
 	}
-	if err = result.Decode(&ticket); err != nil {
-		return ticket, fmt.Errorf("failed to decode prize(id:%s) from DB due to error: %v", id, err)
+	if err = result.Decode(&prize); err != nil {
+		return prize, fmt.Errorf("failed to decode prize(id:%s) from DB due to error: %v", id, err)
 	}
-	return ticket, nil
+	return prize, nil
 }
 
-func (d *db) FindAll(ctx context.Context) (users []ticket.Ticket, err error) {
+func (d *db) FindAll(ctx context.Context) (users []prize.Prize, err error) {
 	cursor, err := d.collection.Find(ctx, bson.M{})
 	if cursor.Err() != nil {
 		return users, fmt.Errorf("failed to find all tickets due to: %v", cursor.Err())
@@ -62,15 +62,15 @@ func (d *db) FindAll(ctx context.Context) (users []ticket.Ticket, err error) {
 }
 
 // Update by ticketID
-func (d *db) Update(ctx context.Context, ticket ticket.Ticket) error {
-	objectID, err := primitive.ObjectIDFromHex(ticket.ID)
+func (d *db) Update(ctx context.Context, prize prize.Prize) error {
+	objectID, err := primitive.ObjectIDFromHex(prize.ID)
 	if err != nil {
-		return fmt.Errorf("failed to convert prize ID to ObjectID. ID=%v", ticket.ID)
+		return fmt.Errorf("failed to convert prize ID to ObjectID. ID=%v", prize.ID)
 	}
 
 	filter := bson.M{"_id": objectID}
 
-	userBytes, err := bson.Marshal(ticket)
+	userBytes, err := bson.Marshal(prize)
 	if err != nil {
 		return fmt.Errorf("failed to marshal prize due to: %v", err)
 	}
@@ -117,7 +117,7 @@ func (d *db) Delete(ctx context.Context, id string) error {
 	return nil
 }
 
-func NewStorage(database *mongo.Database, collection string, logger *logging.Logger) ticket.Storage {
+func NewStorage(database *mongo.Database, collection string, logger *logging.Logger) prize.Storage {
 
 	return &db{
 		collection: database.Collection(collection),

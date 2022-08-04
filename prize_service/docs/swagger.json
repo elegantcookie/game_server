@@ -4,7 +4,7 @@
         "contact": {}
     },
     "paths": {
-        "/api/tickets": {
+        "/api/prizes": {
             "post": {
                 "consumes": [
                     "application/json"
@@ -13,31 +13,11 @@
                     "application/json"
                 ],
                 "tags": [
-                    "Tickets"
+                    "Prizes"
                 ],
                 "summary": "Create prize endpoint",
                 "responses": {
                     "201": {
-                        "description": ""
-                    },
-                    "400": {
-                        "description": ""
-                    }
-                }
-            },
-            "delete": {
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "Tickets"
-                ],
-                "summary": "Delete prize by prize id",
-                "responses": {
-                    "204": {
                         "description": ""
                     },
                     "400": {
@@ -53,9 +33,9 @@
                     "application/json"
                 ],
                 "tags": [
-                    "Tickets"
+                    "Prizes"
                 ],
-                "summary": "Partially update prize by user id",
+                "summary": "Partially update prize by prize id",
                 "responses": {
                     "204": {
                         "description": ""
@@ -66,7 +46,7 @@
                 }
             }
         },
-        "/api/tickets/free/get/status": {
+        "/api/prizes/all": {
             "post": {
                 "consumes": [
                     "application/json"
@@ -75,9 +55,9 @@
                     "application/json"
                 ],
                 "tags": [
-                    "FreeTickets"
+                    "Prizes"
                 ],
-                "summary": "Get free prize status endpoint. Requires authorization",
+                "summary": "Get all prizes",
                 "responses": {
                     "200": {
                         "description": ""
@@ -88,7 +68,7 @@
                 }
             }
         },
-        "/api/tickets/free/set/status": {
+        "/api/prizes/id/:id": {
             "post": {
                 "consumes": [
                     "application/json"
@@ -97,51 +77,7 @@
                     "application/json"
                 ],
                 "tags": [
-                    "FreeTickets"
-                ],
-                "summary": "Set free prize status endpoint. Requires authorization and access key",
-                "responses": {
-                    "200": {
-                        "description": ""
-                    },
-                    "400": {
-                        "description": ""
-                    }
-                }
-            }
-        },
-        "/api/tickets/get/all": {
-            "post": {
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "Tickets"
-                ],
-                "summary": "Get all tickets",
-                "responses": {
-                    "200": {
-                        "description": ""
-                    },
-                    "400": {
-                        "description": ""
-                    }
-                }
-            }
-        },
-        "/api/tickets/get/id": {
-            "post": {
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "Tickets"
+                    "Prizes"
                 ],
                 "summary": "Get prize by prize id",
                 "responses": {
@@ -152,10 +88,8 @@
                         "description": ""
                     }
                 }
-            }
-        },
-        "/api/tickets/get/status/id": {
-            "post": {
+            },
+            "delete": {
                 "consumes": [
                     "application/json"
                 ],
@@ -163,11 +97,11 @@
                     "application/json"
                 ],
                 "tags": [
-                    "Tickets"
+                    "Prizes"
                 ],
-                "summary": "Get prize status by prize id",
+                "summary": "Delete prize by prize id",
                 "responses": {
-                    "200": {
+                    "204": {
                         "description": ""
                     },
                     "400": {
