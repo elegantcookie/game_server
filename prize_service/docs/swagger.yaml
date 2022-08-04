@@ -1,0 +1,82 @@
+info:
+  contact: {}
+paths:
+  /api/prizes:
+    patch:
+      consumes:
+      - application/json
+      produces:
+      - application/json
+      responses:
+        "204":
+          description: ""
+        "400":
+          description: ""
+      summary: Partially update prize by prize id
+      tags:
+      - Prizes
+    post:
+      consumes:
+      - application/json
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: ""
+        "400":
+          description: ""
+      summary: Create prize endpoint
+      tags:
+      - Prizes
+  /api/prizes/all:
+    post:
+      consumes:
+      - application/json
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: ""
+        "400":
+          description: ""
+      summary: Get all prizes
+      tags:
+      - Prizes
+  /api/prizes/id/:id:
+    delete:
+      consumes:
+      - application/json
+      produces:
+      - application/json
+      responses:
+        "204":
+          description: ""
+        "400":
+          description: ""
+      summary: Delete prize by prize id
+      tags:
+      - Prizes
+    post:
+      consumes:
+      - application/json
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: ""
+        "400":
+          description: ""
+      summary: Get prize by prize id
+      tags:
+      - Prizes
+  /userapi/heartbeat:
+    get:
+      responses:
+        "204":
+          description: ""
+        "400":
+          description: ""
+      summary: Heartbeat metric
+      tags:
+      - Metrics
+swagger: "2.0"
