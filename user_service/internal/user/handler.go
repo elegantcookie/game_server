@@ -25,15 +25,15 @@ type Handler struct {
 
 func (h *Handler) Register(router *httprouter.Router) {
 	router.HandlerFunc(http.MethodPost, usersURL, apperror.Middleware(h.CreateUser))
-	router.HandlerFunc(http.MethodGet, usersURL, apperror.AuthMiddleware(h.GetUsers))
-	router.HandlerFunc(http.MethodPost, userIdURL, apperror.AuthMiddleware(h.GetUserById))
-	router.HandlerFunc(http.MethodPost, usernameURL, apperror.AuthMiddleware(h.GetUserByUsername))
+	router.HandlerFunc(http.MethodGet, usersURL, apperror.Middleware(h.GetUsers))
+	router.HandlerFunc(http.MethodPost, userIdURL, apperror.Middleware(h.GetUserById))
+	router.HandlerFunc(http.MethodPost, usernameURL, apperror.Middleware(h.GetUserByUsername))
 	router.HandlerFunc(http.MethodPost, authUrl, apperror.Middleware(h.GetUserByUsernameAndPassword))
-	router.HandlerFunc(http.MethodPatch, usersURL, apperror.AuthMiddleware(h.PartiallyUpdateUser))
-	router.HandlerFunc(http.MethodDelete, userIdURL, apperror.AuthMiddleware(h.DeleteUser))
-	router.HandlerFunc(http.MethodPut, ticketsURL, apperror.AuthMiddleware(h.AddTicket))
-	router.HandlerFunc(http.MethodDelete, ticketsURL, apperror.AuthMiddleware(h.DeleteTicket))
-	router.HandlerFunc(http.MethodPost, freeTicketURL, apperror.AuthMiddleware(h.GetFreeTicketStatus))
+	router.HandlerFunc(http.MethodPatch, usersURL, apperror.Middleware(h.PartiallyUpdateUser))
+	router.HandlerFunc(http.MethodDelete, userIdURL, apperror.Middleware(h.DeleteUser))
+	router.HandlerFunc(http.MethodPut, ticketsURL, apperror.Middleware(h.AddTicket))
+	router.HandlerFunc(http.MethodDelete, ticketsURL, apperror.Middleware(h.DeleteTicket))
+	router.HandlerFunc(http.MethodPost, freeTicketURL, apperror.Middleware(h.GetFreeTicketStatus))
 }
 
 // Get user by id
