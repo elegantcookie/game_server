@@ -12,7 +12,7 @@ paths:
           description: ""
         "400":
           description: ""
-      summary: Delete ticket by ticket id
+      summary: Delete prize by prize id
       tags:
       - Tickets
     patch:
@@ -25,7 +25,7 @@ paths:
           description: ""
         "400":
           description: ""
-      summary: Partially update ticket by user id
+      summary: Partially update prize by user id
       tags:
       - Tickets
     post:
@@ -38,7 +38,7 @@ paths:
           description: ""
         "400":
           description: ""
-      summary: Create ticket endpoint
+      summary: Create prize endpoint
       tags:
       - Tickets
   /api/tickets/free/get/status:
@@ -52,7 +52,7 @@ paths:
           description: ""
         "400":
           description: ""
-      summary: Get free ticket status endpoint. Requires authorization
+      summary: Get free prize status endpoint. Requires authorization
       tags:
       - FreeTickets
   /api/tickets/free/set/status:
@@ -66,8 +66,7 @@ paths:
           description: ""
         "400":
           description: ""
-      summary: Set free ticket status endpoint. Requires authorization and access
-        key
+      summary: Set free prize status endpoint. Requires authorization and access key
       tags:
       - FreeTickets
   /api/tickets/get/all:
@@ -95,7 +94,7 @@ paths:
           description: ""
         "400":
           description: ""
-      summary: Get ticket by ticket id
+      summary: Get prize by prize id
       tags:
       - Tickets
   /api/tickets/get/status/id:
@@ -109,7 +108,7 @@ paths:
           description: ""
         "400":
           description: ""
-      summary: Get ticket status by ticket id
+      summary: Get prize status by prize id
       tags:
       - Tickets
   /userapi/heartbeat:
