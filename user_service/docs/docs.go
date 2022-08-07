@@ -153,7 +153,7 @@ const docTemplate = `{
                 "tags": [
                     "Tickets"
                 ],
-                "summary": "Add prize by user id and prize id",
+                "summary": "Add lobby by user id and lobby id",
                 "responses": {
                     "201": {
                         "description": ""
@@ -173,7 +173,7 @@ const docTemplate = `{
                 "tags": [
                     "Tickets"
                 ],
-                "summary": "Delete prize by user id and prize id",
+                "summary": "Delete lobby by user id and lobby id",
                 "responses": {
                     "204": {
                         "description": ""
@@ -195,7 +195,7 @@ const docTemplate = `{
                 "tags": [
                     "Tickets"
                 ],
-                "summary": "Get prize status",
+                "summary": "Get lobby status",
                 "responses": {
                     "200": {
                         "description": ""

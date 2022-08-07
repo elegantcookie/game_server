@@ -249,8 +249,8 @@ func (h *Handler) DeleteUser(w http.ResponseWriter, r *http.Request) error {
 	return nil
 }
 
-// Add prize
-// @Summary Add prize by user id and prize id
+// Add ticket
+// @Summary Add ticket by user id and ticket id
 // @Accept json
 // @Produce json
 // @Tags Tickets
@@ -269,15 +269,15 @@ func (h *Handler) AddTicket(w http.ResponseWriter, r *http.Request) error {
 	}
 	err = h.UserService.AddTicket(r.Context(), dto)
 	if err != nil {
-		return fmt.Errorf("unable to add prize due to: %v", err)
+		return fmt.Errorf("unable to add ticket due to: %v", err)
 	}
 	w.WriteHeader(http.StatusCreated)
 
 	return nil
 }
 
-// Delete prize
-// @Summary Delete prize by user id and prize id
+// Delete ticket
+// @Summary Delete ticket by user id and ticket id
 // @Accept json
 // @Produce json
 // @Tags Tickets
@@ -296,15 +296,15 @@ func (h *Handler) DeleteTicket(w http.ResponseWriter, r *http.Request) error {
 	}
 	err = h.UserService.DeleteTicket(r.Context(), dto)
 	if err != nil {
-		return fmt.Errorf("unable to delete prize due to: %v", err)
+		return fmt.Errorf("unable to delete ticket due to: %v", err)
 	}
 	w.WriteHeader(http.StatusNoContent)
 
 	return nil
 }
 
-// Get prize status
-// @Summary Get prize status
+// Get ticket status
+// @Summary Get ticket status
 // @Accept json
 // @Produce json
 // @Tags Tickets

@@ -12,7 +12,7 @@ paths:
           description: ""
         "400":
           description: ""
-      summary: Delete prize by prize id
+      summary: Delete lobby by lobby id
       tags:
       - Tickets
     patch:
@@ -25,7 +25,7 @@ paths:
           description: ""
         "400":
           description: ""
-      summary: Partially update prize by user id
+      summary: Partially update lobby by user id
       tags:
       - Tickets
     post:
@@ -38,7 +38,7 @@ paths:
           description: ""
         "400":
           description: ""
-      summary: Create prize endpoint
+      summary: Create lobby endpoint
       tags:
       - Tickets
   /api/tickets/free/get/status:
@@ -52,7 +52,7 @@ paths:
           description: ""
         "400":
           description: ""
-      summary: Get free prize status endpoint. Requires authorization
+      summary: Get free lobby status endpoint. Requires authorization
       tags:
       - FreeTickets
   /api/tickets/free/set/status:
@@ -66,7 +66,7 @@ paths:
           description: ""
         "400":
           description: ""
-      summary: Set free prize status endpoint. Requires authorization and access key
+      summary: Set free lobby status endpoint. Requires authorization and access key
       tags:
       - FreeTickets
   /api/tickets/get/all:
@@ -94,7 +94,7 @@ paths:
           description: ""
         "400":
           description: ""
-      summary: Get prize by prize id
+      summary: Get lobby by lobby id
       tags:
       - Tickets
   /api/tickets/get/status/id:
@@ -108,7 +108,7 @@ paths:
           description: ""
         "400":
           description: ""
-      summary: Get prize status by prize id
+      summary: Get lobby status by lobby id
       tags:
       - Tickets
   /userapi/heartbeat:

@@ -27,7 +27,7 @@ const docTemplate = `{
                 "tags": [
                     "Tickets"
                 ],
-                "summary": "Create prize endpoint",
+                "summary": "Create lobby endpoint",
                 "responses": {
                     "201": {
                         "description": ""
@@ -47,7 +47,7 @@ const docTemplate = `{
                 "tags": [
                     "Tickets"
                 ],
-                "summary": "Delete prize by prize id",
+                "summary": "Delete lobby by lobby id",
                 "responses": {
                     "204": {
                         "description": ""
@@ -67,7 +67,7 @@ const docTemplate = `{
                 "tags": [
                     "Tickets"
                 ],
-                "summary": "Partially update prize by user id",
+                "summary": "Partially update lobby by user id",
                 "responses": {
                     "204": {
                         "description": ""
@@ -89,7 +89,7 @@ const docTemplate = `{
                 "tags": [
                     "FreeTickets"
                 ],
-                "summary": "Get free prize status endpoint. Requires authorization",
+                "summary": "Get free lobby status endpoint. Requires authorization",
                 "responses": {
                     "200": {
                         "description": ""
@@ -111,7 +111,7 @@ const docTemplate = `{
                 "tags": [
                     "FreeTickets"
                 ],
-                "summary": "Set free prize status endpoint. Requires authorization and access key",
+                "summary": "Set free lobby status endpoint. Requires authorization and access key",
                 "responses": {
                     "200": {
                         "description": ""
@@ -155,7 +155,7 @@ const docTemplate = `{
                 "tags": [
                     "Tickets"
                 ],
-                "summary": "Get prize by prize id",
+                "summary": "Get lobby by lobby id",
                 "responses": {
                     "200": {
                         "description": ""
@@ -177,7 +177,7 @@ const docTemplate = `{
                 "tags": [
                     "Tickets"
                 ],
-                "summary": "Get prize status by prize id",
+                "summary": "Get lobby status by lobby id",
                 "responses": {
                     "200": {
                         "description": ""

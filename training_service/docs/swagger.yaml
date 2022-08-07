@@ -93,7 +93,7 @@ paths:
           description: ""
         "400":
           description: ""
-      summary: Get all records of a prize
+      summary: Get all records of a lobby
       tags:
       - Records
   /api/training/get/id:

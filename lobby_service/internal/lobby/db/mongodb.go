@@ -7,8 +7,8 @@ import (
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
-	"ticket_service/internal/ticket"
-	"ticket_service/pkg/logging"
+	"lobby_service/internal/lobby"
+	"lobby_service/pkg/logging"
 )
 
 type db struct {
@@ -16,8 +16,8 @@ type db struct {
 	logger     *logging.Logger
 }
 
-func (d *db) Create(ctx context.Context, ticket ticket.Ticket) (string, error) {
-	result, err := d.collection.InsertOne(ctx, ticket)
+func (d *db) Create(ctx context.Context, lobby lobby.Lobby) (string, error) {
+	result, err := d.collection.InsertOne(ctx, lobby)
 	if err != nil {
 		return "", fmt.Errorf("failed to create lobby due to: %v", err)
 	}
@@ -26,15 +26,15 @@ func (d *db) Create(ctx context.Context, ticket ticket.Ticket) (string, error) {
 	if ok {
 		return oid.Hex(), nil
 	}
-	d.logger.Trace(ticket)
+	d.logger.Trace(lobby)
 	return "", fmt.Errorf("failed to convert objectId to hex. probable oid: %s", oid)
 }
 
-// FindById find lobby by ticketID
-func (d *db) FindById(ctx context.Context, id string) (ticket ticket.Ticket, err error) {
+// FindById find lobby by lobbyID
+func (d *db) FindById(ctx context.Context, id string) (lobby lobby.Lobby, err error) {
 	oid, err := primitive.ObjectIDFromHex(id)
 	if err != nil {
-		return ticket, fmt.Errorf("failed to convert hex to objectID, hex: %s", id)
+		return lobby, fmt.Errorf("failed to convert hex to objectID, hex: %s", id)
 	}
 	filter := bson.M{"_id": oid}
 	result := d.collection.FindOne(ctx, filter)
@@ -42,18 +42,18 @@ func (d *db) FindById(ctx context.Context, id string) (ticket ticket.Ticket, err
 		if errors.Is(result.Err(), mongo.ErrNoDocuments) {
 			// TODO ErrEntityNotFound
 		}
-		return ticket, fmt.Errorf("failed to find lobby by id: %s due to error: %v", id, result.Err())
+		return lobby, fmt.Errorf("failed to find lobby by id: %s due to error: %v", id, result.Err())
 	}
-	if err = result.Decode(&ticket); err != nil {
-		return ticket, fmt.Errorf("failed to decode lobby(id:%s) from DB due to error: %v", id, err)
+	if err = result.Decode(&lobby); err != nil {
+		return lobby, fmt.Errorf("failed to decode lobby(id:%s) from DB due to error: %v", id, err)
 	}
-	return ticket, nil
+	return lobby, nil
 }
 
-func (d *db) FindAll(ctx context.Context) (users []ticket.Ticket, err error) {
+func (d *db) FindAll(ctx context.Context) (users []lobby.Lobby, err error) {
 	cursor, err := d.collection.Find(ctx, bson.M{})
 	if cursor.Err() != nil {
-		return users, fmt.Errorf("failed to find all tickets due to: %v", cursor.Err())
+		return users, fmt.Errorf("failed to find all lobbys due to: %v", cursor.Err())
 	}
 	if err := cursor.All(ctx, &users); err != nil {
 		return users, fmt.Errorf("failed to read all documents from cursor")
@@ -61,16 +61,16 @@ func (d *db) FindAll(ctx context.Context) (users []ticket.Ticket, err error) {
 	return users, nil
 }
 
-// Update by ticketID
-func (d *db) Update(ctx context.Context, ticket ticket.Ticket) error {
-	objectID, err := primitive.ObjectIDFromHex(ticket.ID)
+// Update by lobbyID
+func (d *db) Update(ctx context.Context, lobby lobby.Lobby) error {
+	objectID, err := primitive.ObjectIDFromHex(lobby.ID)
 	if err != nil {
-		return fmt.Errorf("failed to convert lobby ID to ObjectID. ID=%v", ticket.ID)
+		return fmt.Errorf("failed to convert lobby ID to ObjectID. ID=%v", lobby.ID)
 	}
 
 	filter := bson.M{"_id": objectID}
 
-	userBytes, err := bson.Marshal(ticket)
+	userBytes, err := bson.Marshal(lobby)
 	if err != nil {
 		return fmt.Errorf("failed to marshal lobby due to: %v", err)
 	}
@@ -96,7 +96,7 @@ func (d *db) Update(ctx context.Context, ticket ticket.Ticket) error {
 	return nil
 }
 
-// Delete lobby by ticketID
+// Delete lobby by lobbyID
 func (d *db) Delete(ctx context.Context, id string) error {
 	objectID, err := primitive.ObjectIDFromHex(id)
 	if err != nil {
@@ -117,7 +117,7 @@ func (d *db) Delete(ctx context.Context, id string) error {
 	return nil
 }
 
-func NewStorage(database *mongo.Database, collection string, logger *logging.Logger) ticket.Storage {
+func NewStorage(database *mongo.Database, collection string, logger *logging.Logger) lobby.Storage {
 
 	return &db{
 		collection: database.Collection(collection),

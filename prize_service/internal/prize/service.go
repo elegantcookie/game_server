@@ -44,7 +44,7 @@ func (s service) Create(ctx context.Context, dto PrizeDTO) (ticketID string, err
 		if errors.Is(err, auth.ErrNotFound) {
 			return ticketID, err
 		}
-		return ticketID, fmt.Errorf("failed to create prize. error: %w", err)
+		return ticketID, fmt.Errorf("failed to create lobby. error: %w", err)
 	}
 
 	return ticketID, nil
@@ -77,7 +77,7 @@ func (s service) Update(ctx context.Context, prize Prize) error {
 		if errors.Is(err, auth.ErrNotFound) {
 			return err
 		}
-		return fmt.Errorf("failed to update prize. error: %w", err)
+		return fmt.Errorf("failed to update lobby. error: %w", err)
 	}
 	return err
 }
@@ -89,7 +89,7 @@ func (s service) Delete(ctx context.Context, id string) error {
 		if errors.Is(err, auth.ErrNotFound) {
 			return err
 		}
-		return fmt.Errorf("failed to delete prize. error: %w", err)
+		return fmt.Errorf("failed to delete lobby. error: %w", err)
 	}
 	return err
 }

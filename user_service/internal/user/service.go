@@ -46,7 +46,7 @@ func (s service) Create(ctx context.Context, dto CreateUserDTO) (userID string, 
 		return
 	}
 
-	user.Tickets = []string{}
+	user.Tickets = []GameTickets{}
 	userID, err = s.storage.Create(ctx, user)
 
 	if err != nil {
@@ -139,9 +139,18 @@ func (s service) Delete(ctx context.Context, uuid string) error {
 	return err
 }
 
-func ticketInArray(ticketID string, ticketIDS []string) (index int, isIn bool) {
-	for i := 0; i < len(ticketIDS); i++ {
-		if ticketIDS[i] == ticketID {
+func getGameTickets(gameType string, gameTicketsArr []GameTickets) (index int, found bool) {
+	for i := 0; i < len(gameTicketsArr); i++ {
+		if gameTicketsArr[i].GameType == gameType {
+			return i, true
+		}
+	}
+	return -1, false
+}
+
+func getTicketID(ticketID string, gameTickets GameTickets) (index int, found bool) {
+	for i := 0; i < len(gameTickets.IDsOfGT); i++ {
+		if gameTickets.IDsOfGT[i] == ticketID {
 			return i, true
 		}
 	}
@@ -153,11 +162,22 @@ func (s service) AddTicket(ctx context.Context, dto TicketDTO) error {
 	if err != nil {
 		return err
 	}
-	if _, isIn := ticketInArray(dto.TicketID, user.Tickets); isIn {
-		return fmt.Errorf("user already has prize with ID: %s", dto.TicketID)
-	}
 
-	user.Tickets = append(user.Tickets, dto.TicketID)
+	i, gtFound := getGameTickets(dto.GameType, user.Tickets)
+	if gtFound {
+		_, found := getTicketID(dto.TicketID, user.Tickets[i])
+		if found {
+			return fmt.Errorf("ticket is already in list")
+		}
+		user.Tickets[i].IDsOfGT = append(user.Tickets[i].IDsOfGT, dto.TicketID)
+		user.Tickets[i].Amount += 1
+	} else {
+		user.Tickets = append(user.Tickets, GameTickets{
+			GameType: dto.GameType,
+			Amount:   1,
+			IDsOfGT:  []string{dto.TicketID},
+		})
+	}
 
 	update := UpdateUserDTO{
 		ID:       user.ID,
@@ -176,18 +196,18 @@ func (s service) DeleteTicket(ctx context.Context, dto TicketDTO) error {
 	if err != nil {
 		return err
 	}
-	var (
-		index int
-		isIn  bool
-	)
 
-	if index, isIn = ticketInArray(dto.TicketID, user.Tickets); !isIn {
-		return fmt.Errorf("user doesn't have prize with ID: %s", dto.TicketID)
+	i, gtFound := getGameTickets(dto.GameType, user.Tickets)
+	if gtFound {
+		j, found := getTicketID(dto.TicketID, user.Tickets[i])
+		if !found {
+			return fmt.Errorf("ticket with id: %s not found", dto.TicketID)
+		}
+		user.Tickets[i].IDsOfGT = append(user.Tickets[i].IDsOfGT[:j], user.Tickets[i].IDsOfGT[j+1:]...)
+		user.Tickets[i].Amount -= 1
+	} else {
+		return fmt.Errorf("user has no tickets of game type: %s", dto.GameType)
 	}
-
-	user.Tickets = append(user.Tickets[:index], user.Tickets[index+1:]...)
-
-	s.logger.Printf("tickets: %v", user.Tickets)
 
 	update := UpdateUserDTO{
 		ID:       user.ID,

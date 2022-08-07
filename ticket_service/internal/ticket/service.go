@@ -29,6 +29,7 @@ type Service interface {
 	GetById(ctx context.Context, id string) (Ticket, error)
 	Update(ctx context.Context, dto Ticket) error
 	Delete(ctx context.Context, id string) error
+	UseTicket(ctx context.Context, ticketID string) error
 	SetFreeTicketStatus(dto FreeTicketStatusDTO) error
 	GetFreeTicketStatus() bool
 }
@@ -47,7 +48,7 @@ func (s service) Create(ctx context.Context, dto TicketDTO) (ticketID string, er
 		if errors.Is(err, auth.ErrNotFound) {
 			return ticketID, err
 		}
-		return ticketID, fmt.Errorf("failed to create prize. error: %w", err)
+		return ticketID, fmt.Errorf("failed to create lobby. error: %w", err)
 	}
 
 	return ticketID, nil
@@ -56,7 +57,6 @@ func (s service) Create(ctx context.Context, dto TicketDTO) (ticketID string, er
 // GetOne Ticket by id
 func (s service) GetById(ctx context.Context, id string) (t Ticket, err error) {
 	t, err = s.storage.FindById(ctx, id)
-
 	if err != nil {
 		if errors.Is(err, auth.ErrNotFound) {
 			return t, err
@@ -83,6 +83,23 @@ func (s service) Update(ctx context.Context, ticket Ticket) error {
 		return fmt.Errorf("failed to update Ticket. error: %w", err)
 	}
 	return err
+}
+
+func (s service) UseTicket(ctx context.Context, ticketID string) error {
+	ticket, err := s.GetById(ctx, ticketID)
+	if err != nil {
+		return err
+	}
+	if ticket.IsActive == false {
+		return fmt.Errorf("ticket is already used")
+	}
+	ticket.IsActive = false
+	err = s.Update(ctx, ticket)
+	if err != nil {
+		return err
+	}
+	return nil
+
 }
 
 func (s service) Delete(ctx context.Context, id string) error {

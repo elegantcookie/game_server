@@ -28,7 +28,7 @@ type Service interface {
 
 // SignIn method is called when some JSON request got to /auth/ as login: login, pwd:pwd
 // To find out what to do with that we:
-// At first we check if the given login is in the db if yes, we authorize the user
+// At first check if the given login is in the db if yes, we authorize the user
 // If not then create new user
 func (s service) SignIn(ctx context.Context, body io.ReadCloser) (token string, err error) {
 	var dto UserDTO
