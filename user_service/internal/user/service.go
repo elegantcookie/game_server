@@ -180,9 +180,10 @@ func (s service) AddTicket(ctx context.Context, dto TicketDTO) error {
 	}
 
 	update := UpdateUserDTO{
-		ID:       user.ID,
-		Username: user.Username,
-		Tickets:  user.Tickets,
+		ID:            user.ID,
+		Username:      user.Username,
+		HasFreeTicket: user.HasFreeTicket,
+		Tickets:       user.Tickets,
 	}
 	err = s.Update(ctx, update)
 	if err != nil {
