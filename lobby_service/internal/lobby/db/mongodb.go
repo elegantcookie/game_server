@@ -117,10 +117,28 @@ func (d *db) Delete(ctx context.Context, id string) error {
 	return nil
 }
 
+func (d *db) FindByParams(ctx context.Context, gameType string, maxPlayers, prizeSum int) (lobbyID string, err error) {
+	filter := bson.M{"game_type": gameType, "max_players": maxPlayers, "prize_sum": prizeSum}
+	result := d.collection.FindOne(ctx, filter)
+	if result.Err() != nil {
+		if errors.Is(result.Err(), mongo.ErrNoDocuments) {
+			// TODO ErrEntityNotFound
+		}
+		return "", fmt.Errorf("failed to find lobby by params due to error: %v", result.Err())
+	}
+
+	var l lobby.Lobby
+	if err = result.Decode(&l); err != nil {
+		return "", fmt.Errorf("failed to decode lobby from DB due to error: %v", err)
+	}
+	return l.ID, nil
+}
+
 func NewStorage(database *mongo.Database, collection string, logger *logging.Logger) lobby.Storage {
 
 	return &db{
 		collection: database.Collection(collection),
 		logger:     logger,
 	}
+
 }

@@ -11,10 +11,11 @@ import (
 )
 
 var (
-	lobbiesUrl      = "/api/lobbies"
-	getAllLobbysUrl = "/api/lobbies/all"
-	lobbyUrl        = "/api/lobbies/id/:id"
-	joinLobbyURL    = "/api/lobbies/join"
+	lobbiesUrl            = "/api/lobbies"
+	getAllLobbysUrl       = "/api/lobbies/all"
+	lobbyUrl              = "/api/lobbies/id/:id"
+	joinLobbyURL          = "/api/lobbies/join"
+	getLobbyIDByParamsURL = "/api/lobbies/params"
 )
 
 type Handler struct {
@@ -29,6 +30,7 @@ func (h *Handler) Register(router *httprouter.Router) {
 	router.HandlerFunc(http.MethodDelete, lobbyUrl, auth.Middleware(h.DeleteLobby))
 	router.HandlerFunc(http.MethodPatch, lobbiesUrl, auth.Middleware(h.PartiallyUpdateLobby))
 	router.HandlerFunc(http.MethodPost, joinLobbyURL, auth.Middleware(h.JoinLobby))
+	router.HandlerFunc(http.MethodPost, getLobbyIDByParamsURL, auth.Middleware(h.GetLobbyIDByParams))
 }
 
 // Create lobby
@@ -190,4 +192,30 @@ func (h *Handler) JoinLobby(w http.ResponseWriter, r *http.Request) error {
 
 	w.WriteHeader(http.StatusOK)
 	return nil
+}
+
+func (h *Handler) GetLobbyIDByParams(w http.ResponseWriter, r *http.Request) error {
+	h.Logger.Info("TEST")
+	w.Header().Set("Content-Type", "application/json")
+	w.Header().Set("Access-Control-Request-Methods", "POST, GET, OPTIONS, PUT, DELETE, PATCH")
+	w.Header().Set("Access-Control-Allow-Methods", "POST, GET, OPTIONS, PUT, DELETE, PATCH")
+	var params Params
+	if err := json.NewDecoder(r.Body).Decode(&params); err != nil {
+		return auth.BadRequestError("invalid JSON scheme. check swagger API")
+	}
+	lobbyID, err := h.LobbyService.GetLobbyIDByParams(r.Context(), params)
+	if err != nil {
+		return err
+	}
+	tmp := make(map[string]string)
+	tmp["id"] = lobbyID
+
+	bytes, err := json.Marshal(tmp)
+	if err != nil {
+		return err
+	}
+	w.Write(bytes)
+	w.WriteHeader(http.StatusOK)
+	return err
+
 }

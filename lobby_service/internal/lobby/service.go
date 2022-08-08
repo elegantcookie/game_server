@@ -10,8 +10,10 @@ import (
 	"lobby_service/internal/auth"
 	"lobby_service/internal/lobby/api"
 	"lobby_service/pkg/logging"
+	"log"
 	"net/http"
 	"strings"
+	"time"
 )
 
 var _ Service = &service{}
@@ -35,19 +37,36 @@ type Service interface {
 	Update(ctx context.Context, dto Lobby) error
 	Delete(ctx context.Context, id string) error
 	AddUserToLobby(ctx context.Context, dto JoinLobbyDTO) error
+	GetLobbyIDByParams(ctx context.Context, params Params) (string, error)
 }
 
 func (s service) Create(ctx context.Context, dto LobbyDTO) (lobbyID string, err error) {
 	s.logger.Debug("check password")
+	var start int
+	now := time.Now()
+	hour := now.Hour()
+	if hour%2 == 0 {
+		start = hour + 2
+	} else {
+		start = hour + 1
+	}
+	startDate := time.Date(now.Year(), now.Month(), now.Day(), start, 0, 0, 0, now.Location()).Unix()
+	endDate := time.Date(now.Year(), now.Month(), now.Day(), start+2, 0, 0, 0, now.Location()).Unix()
+
 	lobby := Lobby{
 		GameType:    dto.GameType,
 		MaxPlayers:  dto.MaxPlayers,
 		TicketPrice: dto.TicketPrice,
 		PrizeSum:    dto.PrizeSum,
 		Players:     []Player{},
-		StartTime:   dto.StartTime,
-		EndTime:     dto.EndTime,
+		StartTime:   startDate,
+		EndTime:     endDate,
 	}
+	if startDate == 0 || endDate == 0 {
+		lobby.StartTime = dto.StartTime
+		lobby.EndTime = dto.EndTime
+	}
+
 	lobbyID, err = s.storage.Create(ctx, lobby)
 	if err != nil {
 		if errors.Is(err, auth.ErrNotFound) {
@@ -91,6 +110,18 @@ func (s service) Update(ctx context.Context, lobby Lobby) error {
 	return err
 }
 
+func (s service) Delete(ctx context.Context, id string) error {
+	err := s.storage.Delete(ctx, id)
+
+	if err != nil {
+		if errors.Is(err, auth.ErrNotFound) {
+			return err
+		}
+		return fmt.Errorf("failed to delete lobby. error: %w", err)
+	}
+	return err
+}
+
 func getPlayerIndex(id string, players []Player) (int, bool) {
 	for i, player := range players {
 		if player.ID == id {
@@ -103,7 +134,7 @@ func getPlayerIndex(id string, players []Player) (int, bool) {
 func GetUserByID(ctx context.Context, userID string) (dto UpdateUserDTO, err error) {
 	_u := fmt.Sprintf("%s%s", GetUsersByIDURL, userID)
 
-	response, err := api.MakeRequest(http.MethodPost, _u, nil)
+	response, err := api.MakeRequestWithContext(ctx, http.MethodPost, _u, nil)
 	if err != nil {
 		return dto, err
 	}
@@ -131,7 +162,7 @@ func getGameTickets(gameType string, gameTicketsArr []GameTickets) (index int, f
 
 func UseTicket(ctx context.Context, ticketID string) error {
 	url := fmt.Sprintf("%s/%s", UseTicketURL, ticketID)
-	response, err := api.MakeRequest(http.MethodPost, url, nil)
+	response, err := api.MakeRequestWithContext(ctx, http.MethodPost, url, nil)
 	if err != nil {
 		return fmt.Errorf("failed to do request due to: %v", err)
 	}
@@ -166,20 +197,18 @@ func UpdateUserTicket(ctx context.Context, gameType string, dto UpdateUserDTO) e
 		return err
 	}
 
-	_, err = api.MakeRequest(http.MethodPatch, _url, io.NopCloser(strings.NewReader(string(bytes))))
+	response, err := api.MakeRequestWithContext(ctx, http.MethodPost, _url, io.NopCloser(strings.NewReader(string(bytes))))
 	if err != nil {
-		return fmt.Errorf("failed to do request")
+		return fmt.Errorf("failed to do request due to: %v", err)
 	}
-	//if response.StatusCode != 200 {
-	//	bytes, err := ioutil.ReadAll(response.Body)
-	//	if err != nil {
-	//		return err
-	//	}
-	//	return fmt.Errorf("failed to update user due to: %s", string(bytes))
-	//}
+	if response.StatusCode != 204 {
+		return fmt.Errorf("user service returned wrong status code: %d", response.StatusCode)
+	}
 	return nil
 }
 
+// AddUserToLobby needs check if user has such ticket.
+// Or check must be on client
 func (s service) AddUserToLobby(ctx context.Context, dto JoinLobbyDTO) error {
 	s.logger.Println("GOT INTO addUserToLobby")
 	lobby, err := s.storage.FindById(ctx, dto.LobbyID)
@@ -194,6 +223,23 @@ func (s service) AddUserToLobby(ctx context.Context, dto JoinLobbyDTO) error {
 		lobby.Players[i].Ready = true
 	} else {
 		if lobby.NowPlayers == lobby.MaxPlayers {
+			// TODO fix time now it calculates as nearest even hour
+			lobbyDTO := LobbyDTO{
+				GameType:    lobby.GameType,
+				MaxPlayers:  lobby.MaxPlayers,
+				NowPlayers:  0,
+				TicketPrice: lobby.TicketPrice,
+				PrizeSum:    lobby.PrizeSum,
+				PrizeType:   lobby.PrizeType,
+				StartTime:   lobby.EndTime,
+				EndTime:     lobby.EndTime + TwoHours,
+			}
+			log.Printf("%v", lobbyDTO)
+			s.Create(ctx, lobbyDTO)
+			// create new lobby with same params
+			// wait for start time to make sure all players are ready
+			// start game service after 2 minutes from the start
+			// delete lobby
 			return fmt.Errorf("lobby is full")
 		}
 
@@ -236,14 +282,10 @@ func (s service) AddUserToLobby(ctx context.Context, dto JoinLobbyDTO) error {
 	return nil
 }
 
-func (s service) Delete(ctx context.Context, id string) error {
-	err := s.storage.Delete(ctx, id)
-
+func (s service) GetLobbyIDByParams(ctx context.Context, params Params) (lobbyID string, err error) {
+	lobbyID, err = s.storage.FindByParams(ctx, params.GameType, params.MaxPlayers, params.PrizeSum)
 	if err != nil {
-		if errors.Is(err, auth.ErrNotFound) {
-			return err
-		}
-		return fmt.Errorf("failed to delete lobby. error: %w", err)
+		return "", err
 	}
-	return err
+	return lobbyID, nil
 }

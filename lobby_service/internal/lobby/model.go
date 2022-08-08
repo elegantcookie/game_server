@@ -9,8 +9,8 @@ type Lobby struct {
 	PrizeSum    int      `json:"prize_sum" bson:"prize_sum"`
 	PrizeType   int      `json:"prize_type" bson:"prize_type"`
 	Players     []Player `json:"players" bson:"players"`
-	StartTime   string   `json:"start_time" bson:"start_time"`
-	EndTime     string   `json:"end_time" bson:"end_time"`
+	StartTime   int64    `json:"start_time" bson:"start_time"`
+	EndTime     int64    `json:"end_time" bson:"end_time"`
 }
 
 type Player struct {
@@ -31,6 +31,15 @@ type GameTickets struct {
 	IDsOfGT  []string `json:"tickets_of_gt"`
 }
 
+//type CreateLobbyDTO struct {
+//	GameType    string `json:"game_type"`
+//	MaxPlayers  int    `json:"max_players"`
+//	NowPlayers  int    `json:"now_players"`
+//	TicketPrice int    `json:"ticket_price"`
+//	PrizeSum    int    `json:"prize_sum"`
+//	PrizeType   int    `json:"prize_type"`
+//}
+
 type LobbyDTO struct {
 	GameType    string `json:"game_type"`
 	MaxPlayers  int    `json:"max_players"`
@@ -38,12 +47,18 @@ type LobbyDTO struct {
 	TicketPrice int    `json:"ticket_price"`
 	PrizeSum    int    `json:"prize_sum"`
 	PrizeType   int    `json:"prize_type"`
-	StartTime   string `json:"start_time"`
-	EndTime     string `json:"end_time"`
+	StartTime   int64  `json:"start_time"`
+	EndTime     int64  `json:"end_time"`
 }
 
 type JoinLobbyDTO struct {
 	UserID   string `json:"user_id"`
 	LobbyID  string `json:"lobby_id"`
 	TicketID string `json:"ticket_id"`
+}
+
+type Params struct {
+	GameType   string `json:"game_type"`
+	PrizeSum   int    `json:"prize_sum"`
+	MaxPlayers int    `json:"max_players"`
 }

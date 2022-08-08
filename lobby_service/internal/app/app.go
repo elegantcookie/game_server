@@ -46,7 +46,7 @@ func NewApp(cfg *config.Config, logger *logging.Logger) (App, error) {
 		panic(err)
 	}
 
-	storage := db.NewStorage(mongodbClient, "tickets", logger)
+	storage := db.NewStorage(mongodbClient, "lobbies", logger)
 	service, err := lobby.NewService(storage, *logger)
 	if err != nil {
 		panic(err)
@@ -101,7 +101,7 @@ func (a *App) startHTTP() {
 		AllowedMethods:     []string{http.MethodGet, http.MethodPost, http.MethodPatch, http.MethodPut, http.MethodOptions, http.MethodDelete},
 		AllowedOrigins:     []string{"https://localhost:3000", "https://localhost:8080"},
 		AllowCredentials:   true,
-		AllowedHeaders:     []string{"Authorization", "Location", "Charset", "Access-Control-Allow-Origin", "Content-Type", "content-type"},
+		AllowedHeaders:     []string{"Authorization", "Location", "Charset", "Access-Control-Allow-Origin", "Content-Type", "content-type", "Access-Control-Request-Methods", "Access-Control-Allow-Methods"},
 		OptionsPassthrough: true,
 		ExposedHeaders:     []string{"Access-Token", "Refresh-Token", "Location", "Authorization", "Content-Disposition"},
 		// Enable Debugging for testing, consider disabling in production

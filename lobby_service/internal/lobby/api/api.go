@@ -1,23 +1,17 @@
 package api
 
 import (
+	"context"
 	"io"
 	"net/http"
-	"net/url"
 )
 
-func MakeRequest(requestType string, u string, body io.ReadCloser) (*http.Response, error) {
+func MakeRequestWithContext(ctx context.Context, requestType string, u string, body io.ReadCloser) (*http.Response, error) {
 	var client http.Client
 
-	_url, err := url.Parse(u)
+	request, err := http.NewRequestWithContext(ctx, requestType, u, body)
 	if err != nil {
 		return nil, err
 	}
-	request := http.Request{
-		Method: requestType,
-		URL:    _url,
-		Body:   body,
-	}
-	return client.Do(&request)
-
+	return client.Do(request)
 }
