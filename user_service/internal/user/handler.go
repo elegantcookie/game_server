@@ -16,6 +16,7 @@ const (
 	usernameURL   = "/api/users/username/:username"
 	ticketsURL    = "/api/users/tickets"
 	freeTicketURL = "/api/users/tickets/free/:id"
+	updateURL     = "/api/users/update"
 )
 
 type Handler struct {
@@ -29,7 +30,7 @@ func (h *Handler) Register(router *httprouter.Router) {
 	router.HandlerFunc(http.MethodPost, userIdURL, apperror.Middleware(h.GetUserById))
 	router.HandlerFunc(http.MethodPost, usernameURL, apperror.Middleware(h.GetUserByUsername))
 	router.HandlerFunc(http.MethodPost, authUrl, apperror.Middleware(h.GetUserByUsernameAndPassword))
-	router.HandlerFunc(http.MethodPatch, usersURL, apperror.Middleware(h.PartiallyUpdateUser))
+	router.HandlerFunc(http.MethodPost, updateURL, apperror.Middleware(h.PartiallyUpdateUser))
 	router.HandlerFunc(http.MethodDelete, userIdURL, apperror.Middleware(h.DeleteUser))
 	router.HandlerFunc(http.MethodPut, ticketsURL, apperror.Middleware(h.AddTicket))
 	router.HandlerFunc(http.MethodDelete, ticketsURL, apperror.Middleware(h.DeleteTicket))
