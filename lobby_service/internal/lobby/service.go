@@ -36,12 +36,54 @@ type Service interface {
 	GetById(ctx context.Context, id string) (Lobby, error)
 	Update(ctx context.Context, dto Lobby) error
 	Delete(ctx context.Context, id string) error
+	DeleteAll(ctx context.Context) error
 	AddUserToLobby(ctx context.Context, dto JoinLobbyDTO) error
 	GetLobbyIDByParams(ctx context.Context, params Params) (string, error)
+	UpdateLobbyTime(ctx context.Context, utdto UpdateTimeDTO) (int64, error)
+}
+
+func NotifyManager(ctx context.Context, jwtToken, lobbyID string, startTime int64) error {
+	log.Printf("JWT TOKEN: %v", jwtToken)
+	u := "http://localhost:10007/api/manager/"
+
+	body := io.NopCloser(strings.NewReader(fmt.Sprintf(`
+{
+	"lobby_id": "%s",
+	"expiration": %d
+}`, lobbyID, startTime)))
+	request, err := http.NewRequestWithContext(ctx, http.MethodPost, u, body)
+	log.Println(jwtToken)
+	request.Header.Add("Authorization", jwtToken)
+	var client http.Client
+	response, err := client.Do(request)
+	if err != nil {
+		log.Printf("failed to do request due to: %v", err)
+		return err
+	}
+	if response == nil {
+		log.Println("response is null")
+		return fmt.Errorf("response is null")
+	}
+	if response.StatusCode != 200 {
+		log.Printf("got wrong status code: %d", response.StatusCode)
+
+		return fmt.Errorf("got wrong status code: %d", response.StatusCode)
+	}
+	return nil
 }
 
 func (s service) Create(ctx context.Context, dto LobbyDTO) (lobbyID string, err error) {
-	s.logger.Debug("check password")
+	s.logger.Debug("CREATE LOBBY SERVICE")
+	lobby := Lobby{
+		GameType:    dto.GameType,
+		MaxPlayers:  dto.MaxPlayers,
+		TicketPrice: dto.TicketPrice,
+		PrizeSum:    dto.PrizeSum,
+		Players:     []Player{},
+		StartTime:   dto.StartTime,
+		EndTime:     dto.EndTime,
+	}
+
 	var start int
 	now := time.Now()
 	hour := now.Hour()
@@ -50,22 +92,16 @@ func (s service) Create(ctx context.Context, dto LobbyDTO) (lobbyID string, err 
 	} else {
 		start = hour + 1
 	}
-	startDate := time.Date(now.Year(), now.Month(), now.Day(), start, 0, 0, 0, now.Location()).Unix()
-	endDate := time.Date(now.Year(), now.Month(), now.Day(), start+2, 0, 0, 0, now.Location()).Unix()
 
-	lobby := Lobby{
-		GameType:    dto.GameType,
-		MaxPlayers:  dto.MaxPlayers,
-		TicketPrice: dto.TicketPrice,
-		PrizeSum:    dto.PrizeSum,
-		Players:     []Player{},
-		StartTime:   startDate,
-		EndTime:     endDate,
+	// If start time and is not in a payload then it sets start time as next even hour
+	if dto.StartTime == 0 {
+		startTime := time.Date(now.Year(), now.Month(), now.Day(), start, 0, 0, 0, now.Location()).Unix()
+		lobby.StartTime = startTime
 	}
-	if startDate == 0 || endDate == 0 {
-		lobby.StartTime = dto.StartTime
-		lobby.EndTime = dto.EndTime
-	}
+
+	lobby.EndTime = lobby.StartTime + TwoHours
+
+	log.Printf("CREATING LOBBY WITH START TIME: %v", lobby.StartTime)
 
 	lobbyID, err = s.storage.Create(ctx, lobby)
 	if err != nil {
@@ -75,6 +111,10 @@ func (s service) Create(ctx context.Context, dto LobbyDTO) (lobbyID string, err 
 		return lobbyID, fmt.Errorf("failed to create lobby. error: %w", err)
 	}
 
+	err = NotifyManager(ctx, dto.JWTToken, lobbyID, lobby.StartTime)
+	if err != nil {
+		return "", fmt.Errorf("failed to notify manager due to: %v", err)
+	}
 	return lobbyID, nil
 }
 
@@ -120,6 +160,14 @@ func (s service) Delete(ctx context.Context, id string) error {
 		return fmt.Errorf("failed to delete lobby. error: %w", err)
 	}
 	return err
+}
+
+func (s service) DeleteAll(ctx context.Context) error {
+	err := s.storage.DeleteAll(ctx)
+	if err != nil {
+		return fmt.Errorf("failed to delete lr due to: %v", err)
+	}
+	return nil
 }
 
 func getPlayerIndex(id string, players []Player) (int, bool) {
@@ -207,6 +255,19 @@ func UpdateUserTicket(ctx context.Context, gameType string, dto UpdateUserDTO) e
 	return nil
 }
 
+// RecreateLobby creates lobby using dto and deletes lobby by lobbyID
+func (s service) RecreateLobby(ctx context.Context, dto LobbyDTO, lobbyID string) error {
+	_, err := s.Create(ctx, dto)
+	if err != nil {
+		return err
+	}
+	err = s.Delete(ctx, lobbyID)
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
 // AddUserToLobby needs check if user has such ticket.
 // Or check must be on client
 func (s service) AddUserToLobby(ctx context.Context, dto JoinLobbyDTO) error {
@@ -216,33 +277,22 @@ func (s service) AddUserToLobby(ctx context.Context, dto JoinLobbyDTO) error {
 		return err
 	}
 
-	if i, found := getPlayerIndex(dto.UserID, lobby.Players); found {
+	var (
+		i     int
+		found bool
+	)
+	// If user is in players list then set his status ready
+	if i, found = getPlayerIndex(dto.UserID, lobby.Players); found {
 		if lobby.Players[i].Ready == true {
 			return fmt.Errorf("user is already ready")
 		}
 		lobby.Players[i].Ready = true
 	} else {
+		// If user not in players list
+		// If lobby is full raises error
 		if lobby.NowPlayers == lobby.MaxPlayers {
-			// TODO fix time now it calculates as nearest even hour
-			lobbyDTO := LobbyDTO{
-				GameType:    lobby.GameType,
-				MaxPlayers:  lobby.MaxPlayers,
-				NowPlayers:  0,
-				TicketPrice: lobby.TicketPrice,
-				PrizeSum:    lobby.PrizeSum,
-				PrizeType:   lobby.PrizeType,
-				StartTime:   lobby.EndTime,
-				EndTime:     lobby.EndTime + TwoHours,
-			}
-			log.Printf("%v", lobbyDTO)
-			s.Create(ctx, lobbyDTO)
-			// create new lobby with same params
-			// wait for start time to make sure all players are ready
-			// start game service after 2 minutes from the start
-			// delete lobby
 			return fmt.Errorf("lobby is full")
 		}
-
 		s.logger.Printf("trying to get user by id: %s", dto.UserID)
 
 		user, err := GetUserByID(ctx, dto.UserID)
@@ -279,6 +329,40 @@ func (s service) AddUserToLobby(ctx context.Context, dto JoinLobbyDTO) error {
 	if err != nil {
 		return err
 	}
+
+	// If user is added successfully and lobby got full adds new lobby of the same type
+	if lobby.NowPlayers == lobby.MaxPlayers && !found {
+		lobbyDTO := LobbyDTO{
+			GameType:    lobby.GameType,
+			MaxPlayers:  lobby.MaxPlayers,
+			NowPlayers:  0,
+			TicketPrice: lobby.TicketPrice,
+			PrizeSum:    lobby.PrizeSum,
+			PrizeType:   lobby.PrizeType,
+			StartTime:   lobby.StartTime,
+			EndTime:     lobby.EndTime,
+			JWTToken:    dto.JWTToken,
+		}
+
+		// create new lobby with same params
+		_, err = s.Create(ctx, lobbyDTO)
+		if err != nil {
+			return err
+		}
+
+		// TODO transits data to game server
+
+		// ????
+		// wait for start time to make sure all players are ready
+		// start game service after 2 minutes from the start
+
+		// delete lobby
+		err = s.Delete(ctx, lobby.ID)
+		if err != nil {
+			return err
+		}
+	}
+
 	return nil
 }
 
@@ -288,4 +372,42 @@ func (s service) GetLobbyIDByParams(ctx context.Context, params Params) (lobbyID
 		return "", err
 	}
 	return lobbyID, nil
+}
+
+// UpdateLobbyTime DONE
+func (s service) UpdateLobbyTime(ctx context.Context, utdto UpdateTimeDTO) (int64, error) {
+	lobby, err := s.storage.FindById(ctx, utdto.ID)
+	if err != nil {
+		return 0, fmt.Errorf("failed to find lobby by id due to: %v", err)
+	}
+
+	dto := LobbyDTO{
+		GameType:    lobby.GameType,
+		MaxPlayers:  lobby.MaxPlayers,
+		NowPlayers:  0,
+		TicketPrice: lobby.TicketPrice,
+		PrizeSum:    lobby.PrizeSum,
+		PrizeType:   lobby.PrizeType,
+		StartTime:   lobby.StartTime + 24*OneHour,
+		EndTime:     lobby.EndTime + 24*OneHour,
+		JWTToken:    utdto.JWTToken,
+	}
+	_, err = s.Create(ctx, dto)
+	if err != nil {
+		return 0, fmt.Errorf("failed to create new lobby with same params due to: %v", err)
+	}
+
+	hour := time.Unix(lobby.StartTime, 0).Hour()
+	if hour == 2 {
+		lobby.StartTime += 14 * OneHour
+	} else {
+		lobby.StartTime += OneHour
+	}
+	lobby.EndTime = lobby.StartTime + 2*OneHour
+
+	err = s.storage.Update(ctx, lobby)
+	if err != nil {
+		return 0, fmt.Errorf("failed to update lobby time due to: %v", err)
+	}
+	return lobby.StartTime, nil
 }

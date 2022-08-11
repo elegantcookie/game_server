@@ -11,12 +11,12 @@ import (
 )
 
 var (
-	recordsUrl           = "/api/training/"
-	getAllRecordsUrl     = "/api/training/get/all"
-	getRecordUrl         = "/api/training/get/id"
+	recordsUrl           = "/api/training"
+	getAllRecordsUrl     = "/api/training/get/all/"
+	getRecordUrl         = "/api/training/get/id/"
 	getRecordByUserIDUrl = "/api/training/get/userid"
 	getAllCollectionsUrl = "/api/training/collections/get/all"
-	collectionsUrl       = "/api/training/collections/"
+	collectionsUrl       = "/api/training/collections"
 )
 
 type Handler struct {

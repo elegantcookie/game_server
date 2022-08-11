@@ -1,11 +1,10 @@
 package main
 
 import (
-	_ "auth_service/docs"
-	"auth_service/internal/app"
-	"auth_service/internal/config"
-	"auth_service/pkg/logging"
 	"log"
+	"manager_service/internal/app"
+	"manager_service/internal/config"
+	"manager_service/pkg/logging"
 )
 
 func main() {

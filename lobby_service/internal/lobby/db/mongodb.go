@@ -7,8 +7,10 @@ import (
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
+	"go.mongodb.org/mongo-driver/mongo/options"
 	"lobby_service/internal/lobby"
 	"lobby_service/pkg/logging"
+	"log"
 )
 
 type db struct {
@@ -58,6 +60,7 @@ func (d *db) FindAll(ctx context.Context) (users []lobby.Lobby, err error) {
 	if err := cursor.All(ctx, &users); err != nil {
 		return users, fmt.Errorf("failed to read all documents from cursor")
 	}
+	log.Println(users)
 	return users, nil
 }
 
@@ -117,21 +120,40 @@ func (d *db) Delete(ctx context.Context, id string) error {
 	return nil
 }
 
-func (d *db) FindByParams(ctx context.Context, gameType string, maxPlayers, prizeSum int) (lobbyID string, err error) {
-	filter := bson.M{"game_type": gameType, "max_players": maxPlayers, "prize_sum": prizeSum}
-	result := d.collection.FindOne(ctx, filter)
-	if result.Err() != nil {
-		if errors.Is(result.Err(), mongo.ErrNoDocuments) {
-			// TODO ErrEntityNotFound
-		}
-		return "", fmt.Errorf("failed to find lobby by params due to error: %v", result.Err())
+func (d *db) DeleteAll(ctx context.Context) error {
+
+	filter := bson.M{}
+
+	result, err := d.collection.DeleteMany(ctx, filter)
+	if err != nil {
+		return fmt.Errorf("failed to execute update lr query due to: %v", err)
 	}
 
-	var l lobby.Lobby
-	if err = result.Decode(&l); err != nil {
-		return "", fmt.Errorf("failed to decode lobby from DB due to error: %v", err)
+	if result.DeletedCount == 0 {
+		// TODO ErrEntityNotFound
+		return fmt.Errorf("not found")
 	}
-	return l.ID, nil
+	return nil
+}
+
+func (d *db) FindByParams(ctx context.Context, gameType string, maxPlayers, prizeSum int) (lobbyID string, err error) {
+	filter := bson.M{"game_type": gameType, "max_players": maxPlayers, "prize_sum": prizeSum}
+	findOptions := options.Find()
+	findOptions.SetSort(bson.D{{"start_time", 1}})
+	cursor, err := d.collection.Find(ctx, filter, findOptions)
+	if err != nil {
+		return "", fmt.Errorf("failed to create cursor due to: %v", err)
+	}
+	if cursor.Err() != nil {
+		return "", fmt.Errorf("failed to find all lobbys due to: %v", cursor.Err())
+	}
+	var lobbies []lobby.Lobby
+	err = cursor.All(ctx, &lobbies)
+	if err != nil {
+		return "", fmt.Errorf("failed to iterate through elems due to: %v", err)
+	}
+
+	return lobbies[0].ID, nil
 }
 
 func NewStorage(database *mongo.Database, collection string, logger *logging.Logger) lobby.Storage {

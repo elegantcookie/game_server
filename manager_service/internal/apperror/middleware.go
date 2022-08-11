@@ -1,9 +1,9 @@
-package auth
+package apperror
 
 import (
 	"errors"
-	jwt_setup "lobby_service/pkg/jwt-setup"
 	"log"
+	jwt_setup "manager_service/pkg/jwt-setup"
 	"net/http"
 	"strings"
 )

@@ -10,11 +10,11 @@ import (
 )
 
 const (
-	usersURL      = "/api/users"
-	authUrl       = "/api/users/auth"
+	usersURL      = "/api/users/"
+	authUrl       = "/api/users/auth/"
 	userIdURL     = "/api/users/id/:id"
 	usernameURL   = "/api/users/username/:username"
-	ticketsURL    = "/api/users/tickets"
+	ticketsURL    = "/api/users/tickets/"
 	freeTicketURL = "/api/users/tickets/free/:id"
 	updateURL     = "/api/users/update"
 )

@@ -5,4 +5,5 @@ const (
 	UpdateUserURL   = "http://localhost:10002/api/users/update"
 	UseTicketURL    = "http://localhost:10004/api/tickets/use/"
 	TwoHours        = 7200
+	OneHour         = 3600
 )

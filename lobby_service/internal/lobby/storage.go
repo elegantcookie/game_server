@@ -9,4 +9,5 @@ type Storage interface {
 	FindAll(ctx context.Context) ([]Lobby, error)
 	Update(ctx context.Context, lobby Lobby) error
 	Delete(ctx context.Context, id string) error
+	DeleteAll(ctx context.Context) error
 }

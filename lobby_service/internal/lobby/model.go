@@ -49,16 +49,23 @@ type LobbyDTO struct {
 	PrizeType   int    `json:"prize_type"`
 	StartTime   int64  `json:"start_time"`
 	EndTime     int64  `json:"end_time"`
+	JWTToken    string `json:"-"`
 }
 
 type JoinLobbyDTO struct {
 	UserID   string `json:"user_id"`
 	LobbyID  string `json:"lobby_id"`
 	TicketID string `json:"ticket_id"`
+	JWTToken string `json:"-"`
 }
 
 type Params struct {
 	GameType   string `json:"game_type"`
 	PrizeSum   int    `json:"prize_sum"`
 	MaxPlayers int    `json:"max_players"`
+}
+
+type UpdateTimeDTO struct {
+	ID       string `json:"id"`
+	JWTToken string `json:"-"`
 }
