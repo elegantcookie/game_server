@@ -232,7 +232,7 @@ func (h *Handler) DeleteLobby(w http.ResponseWriter, r *http.Request) error {
 // @Summary Delete all lobbies endpoint
 // @Accept json
 // @Produce json
-// @Tags Lobbies Internal
+// @Tags Lobbies internal
 // @Success 204
 // @Failure 400
 // @Router /api/lobbies/del/all [delete]

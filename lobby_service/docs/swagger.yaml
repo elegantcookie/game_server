@@ -55,7 +55,7 @@ paths:
           description: ""
       summary: Delete all lobbies endpoint
       tags:
-      - Lobbies Internal
+      - Lobbies internal
   /api/lobbies/id/:id:
     delete:
       consumes:

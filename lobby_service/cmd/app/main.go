@@ -1,7 +1,7 @@
 package main
 
 import (
-	//_ "lobby_service/docs"
+	_ "lobby_service/docs"
 	"lobby_service/internal/app"
 	"lobby_service/internal/config"
 	"lobby_service/pkg/logging"
