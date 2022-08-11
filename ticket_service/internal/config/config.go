@@ -29,7 +29,7 @@ type Config struct {
 		Username string `env:"ADMIN_USERNAME"`
 		Password string `env:"ADMIN_PASSWORD"`
 
-		Database string `env:"DATABASE" env-default:"prize-service"`
+		Database string `env:"DATABASE" env-default:"ticket-service"`
 		AuthDB   string `env:"AUTH_DB"`
 	}
 	Keys struct {

@@ -11,12 +11,12 @@ import (
 )
 
 var (
-	recordsUrl           = "/api/training/"
-	getAllRecordsUrl     = "/api/training/get/all"
-	getRecordUrl         = "/api/training/get/id"
+	recordsUrl           = "/api/training"
+	getAllRecordsUrl     = "/api/training/get/all/"
+	getRecordUrl         = "/api/training/get/id/"
 	getRecordByUserIDUrl = "/api/training/get/userid"
 	getAllCollectionsUrl = "/api/training/collections/get/all"
-	collectionsUrl       = "/api/training/collections/"
+	collectionsUrl       = "/api/training/collections"
 )
 
 type Handler struct {
@@ -140,7 +140,7 @@ func (h *Handler) GetRecordByUserId(w http.ResponseWriter, r *http.Request) erro
 }
 
 // Get records
-// @Summary Get all records of a prize
+// @Summary Get all records of a lobby
 // @Accept json
 // @Produce json
 // @Tags Records

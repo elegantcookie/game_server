@@ -22,12 +22,10 @@ func (d *db) Create(ctx context.Context, user user.User) (string, error) {
 	if err != nil {
 		return "", fmt.Errorf("failed to create user due to: %v", err)
 	}
-	d.logger.Debug("convert InsertedID to objectID")
 	oid, ok := result.InsertedID.(primitive.ObjectID)
 	if ok {
 		return oid.Hex(), nil
 	}
-	d.logger.Trace(user)
 	return "", fmt.Errorf("failed to convert objectId to hex. probable oid: %s", oid)
 }
 func (d *db) FindById(ctx context.Context, id string) (u user.User, err error) {

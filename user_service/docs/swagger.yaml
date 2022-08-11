@@ -93,7 +93,7 @@ paths:
           description: ""
         "400":
           description: ""
-      summary: Delete prize by user id and prize id
+      summary: Delete lobby by user id and lobby id
       tags:
       - Tickets
     put:
@@ -106,7 +106,7 @@ paths:
           description: ""
         "400":
           description: ""
-      summary: Add prize by user id and prize id
+      summary: Add lobby by user id and lobby id
       tags:
       - Tickets
   /api/users/tickets/free/:id:
@@ -120,7 +120,7 @@ paths:
           description: ""
         "400":
           description: ""
-      summary: Get prize status
+      summary: Get lobby status
       tags:
       - Tickets
   /api/users/username/:username:

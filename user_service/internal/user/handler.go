@@ -10,12 +10,13 @@ import (
 )
 
 const (
-	usersURL      = "/api/users"
-	authUrl       = "/api/users/auth"
+	usersURL      = "/api/users/"
+	authUrl       = "/api/users/auth/"
 	userIdURL     = "/api/users/id/:id"
 	usernameURL   = "/api/users/username/:username"
-	ticketsURL    = "/api/users/tickets"
+	ticketsURL    = "/api/users/tickets/"
 	freeTicketURL = "/api/users/tickets/free/:id"
+	updateURL     = "/api/users/update"
 )
 
 type Handler struct {
@@ -29,7 +30,7 @@ func (h *Handler) Register(router *httprouter.Router) {
 	router.HandlerFunc(http.MethodPost, userIdURL, apperror.Middleware(h.GetUserById))
 	router.HandlerFunc(http.MethodPost, usernameURL, apperror.Middleware(h.GetUserByUsername))
 	router.HandlerFunc(http.MethodPost, authUrl, apperror.Middleware(h.GetUserByUsernameAndPassword))
-	router.HandlerFunc(http.MethodPatch, usersURL, apperror.Middleware(h.PartiallyUpdateUser))
+	router.HandlerFunc(http.MethodPost, updateURL, apperror.Middleware(h.PartiallyUpdateUser))
 	router.HandlerFunc(http.MethodDelete, userIdURL, apperror.Middleware(h.DeleteUser))
 	router.HandlerFunc(http.MethodPut, ticketsURL, apperror.Middleware(h.AddTicket))
 	router.HandlerFunc(http.MethodDelete, ticketsURL, apperror.Middleware(h.DeleteTicket))
@@ -249,8 +250,8 @@ func (h *Handler) DeleteUser(w http.ResponseWriter, r *http.Request) error {
 	return nil
 }
 
-// Add prize
-// @Summary Add prize by user id and prize id
+// Add ticket
+// @Summary Add ticket by user id and ticket id
 // @Accept json
 // @Produce json
 // @Tags Tickets
@@ -269,15 +270,15 @@ func (h *Handler) AddTicket(w http.ResponseWriter, r *http.Request) error {
 	}
 	err = h.UserService.AddTicket(r.Context(), dto)
 	if err != nil {
-		return fmt.Errorf("unable to add prize due to: %v", err)
+		return fmt.Errorf("unable to add ticket due to: %v", err)
 	}
 	w.WriteHeader(http.StatusCreated)
 
 	return nil
 }
 
-// Delete prize
-// @Summary Delete prize by user id and prize id
+// Delete ticket
+// @Summary Delete ticket by user id and ticket id
 // @Accept json
 // @Produce json
 // @Tags Tickets
@@ -296,15 +297,15 @@ func (h *Handler) DeleteTicket(w http.ResponseWriter, r *http.Request) error {
 	}
 	err = h.UserService.DeleteTicket(r.Context(), dto)
 	if err != nil {
-		return fmt.Errorf("unable to delete prize due to: %v", err)
+		return fmt.Errorf("unable to delete ticket due to: %v", err)
 	}
 	w.WriteHeader(http.StatusNoContent)
 
 	return nil
 }
 
-// Get prize status
-// @Summary Get prize status
+// Get ticket status
+// @Summary Get ticket status
 // @Accept json
 // @Produce json
 // @Tags Tickets

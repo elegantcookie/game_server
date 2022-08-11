@@ -6,15 +6,16 @@ import (
 )
 
 type User struct {
-	ID            string   `json:"id" bson:"_id,omitempty"`
-	Username      string   `json:"username" bson:"username"`
-	Password      string   `json:"-" bson:"password"`
-	HasFreeTicket bool     `json:"has_free_ticket" bson:"has_free_ticket"`
-	Tickets       []string `json:"tickets" bson:"tickets"`
+	ID            string        `json:"id" bson:"_id,omitempty"`
+	Username      string        `json:"username" bson:"username"`
+	Password      string        `json:"-" bson:"password"`
+	HasFreeTicket bool          `json:"has_free_ticket" bson:"has_free_ticket"`
+	Tickets       []GameTickets `json:"tickets" bson:"tickets"`
 }
 
 type TicketDTO struct {
 	ID       string `json:"id"`
+	GameType string `json:"game_type"`
 	TicketID string `json:"ticket_id"`
 }
 
@@ -24,10 +25,16 @@ type CreateUserDTO struct {
 }
 
 type UpdateUserDTO struct {
-	ID            string   `json:"id" bson:"_id,omitempty"`
-	Username      string   `json:"username" bson:"username"`
-	HasFreeTicket bool     `json:"has_free_ticket" bson:"has_free_ticket"`
-	Tickets       []string `json:"tickets" bson:"tickets"`
+	ID            string        `json:"id" bson:"_id,omitempty"`
+	Username      string        `json:"username" bson:"username"`
+	HasFreeTicket bool          `json:"has_free_ticket" bson:"has_free_ticket"`
+	Tickets       []GameTickets `json:"tickets" bson:"tickets"`
+}
+
+type GameTickets struct {
+	GameType string   `json:"game_type"`
+	Amount   int      `json:"amount"`
+	IDsOfGT  []string `json:"tickets_of_gt"`
 }
 
 func NewUser(dto CreateUserDTO) User {
@@ -35,7 +42,7 @@ func NewUser(dto CreateUserDTO) User {
 		Username:      dto.Username,
 		Password:      dto.Password,
 		HasFreeTicket: true,
-		Tickets:       []string{},
+		Tickets:       []GameTickets{},
 	}
 }
 

@@ -29,8 +29,8 @@ func (h *Handler) Register(router *httprouter.Router) {
 	router.HandlerFunc(http.MethodPatch, prizesUrl, auth.Middleware(h.PartiallyUpdatePrize))
 }
 
-// Create prize
-// @Summary Create prize endpoint
+// Create lobby
+// @Summary Create lobby endpoint
 // @Accept json
 // @Produce json
 // @Tags Prizes
@@ -62,8 +62,8 @@ func (h *Handler) CreatePrize(w http.ResponseWriter, r *http.Request) error {
 	return nil
 }
 
-// Get prize by id
-// @Summary Get prize by prize id
+// Get lobby by id
+// @Summary Get lobby by lobby id
 // @Accept json
 // @Produce json
 // @Tags Prizes
@@ -82,10 +82,10 @@ func (h *Handler) GetPrizeById(w http.ResponseWriter, r *http.Request) error {
 		return err
 	}
 
-	h.Logger.Debug("marshal prize")
+	h.Logger.Debug("marshal lobby")
 	prizeBytes, err := json.Marshal(prize)
 	if err != nil {
-		return fmt.Errorf("failed to marshall prize. error: %w", err)
+		return fmt.Errorf("failed to marshall lobby. error: %w", err)
 	}
 
 	w.WriteHeader(http.StatusOK)
@@ -114,7 +114,7 @@ func (h *Handler) GetPrizes(w http.ResponseWriter, r *http.Request) error {
 
 	prizeBytes, err := json.Marshal(prizes)
 	if err != nil {
-		return fmt.Errorf("failed to marshall prize. error: %w", err)
+		return fmt.Errorf("failed to marshall lobby. error: %w", err)
 	}
 
 	w.WriteHeader(http.StatusOK)
@@ -122,8 +122,8 @@ func (h *Handler) GetPrizes(w http.ResponseWriter, r *http.Request) error {
 	return nil
 }
 
-// Partially update prize
-// @Summary Partially update prize by prize id
+// Partially update lobby
+// @Summary Partially update lobby by lobby id
 // @Accept json
 // @Produce json
 // @Tags Prizes
@@ -148,8 +148,8 @@ func (h *Handler) PartiallyUpdatePrize(w http.ResponseWriter, r *http.Request) e
 	return nil
 }
 
-// Delete prize
-// @Summary Delete prize by prize id
+// Delete lobby
+// @Summary Delete lobby by lobby id
 // @Accept json
 // @Produce json
 // @Tags Prizes

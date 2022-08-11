@@ -27,7 +27,7 @@ const docTemplate = `{
                 "tags": [
                     "Prizes"
                 ],
-                "summary": "Create prize endpoint",
+                "summary": "Create lobby endpoint",
                 "responses": {
                     "201": {
                         "description": ""
@@ -47,7 +47,7 @@ const docTemplate = `{
                 "tags": [
                     "Prizes"
                 ],
-                "summary": "Partially update prize by prize id",
+                "summary": "Partially update lobby by lobby id",
                 "responses": {
                     "204": {
                         "description": ""
@@ -91,7 +91,7 @@ const docTemplate = `{
                 "tags": [
                     "Prizes"
                 ],
-                "summary": "Get prize by prize id",
+                "summary": "Get lobby by lobby id",
                 "responses": {
                     "200": {
                         "description": ""
@@ -111,7 +111,7 @@ const docTemplate = `{
                 "tags": [
                     "Prizes"
                 ],
-                "summary": "Delete prize by prize id",
+                "summary": "Delete lobby by lobby id",
                 "responses": {
                     "204": {
                         "description": ""

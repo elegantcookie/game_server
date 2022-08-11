@@ -12,7 +12,7 @@ paths:
           description: ""
         "400":
           description: ""
-      summary: Partially update prize by prize id
+      summary: Partially update lobby by lobby id
       tags:
       - Prizes
     post:
@@ -25,7 +25,7 @@ paths:
           description: ""
         "400":
           description: ""
-      summary: Create prize endpoint
+      summary: Create lobby endpoint
       tags:
       - Prizes
   /api/prizes/all:
@@ -53,7 +53,7 @@ paths:
           description: ""
         "400":
           description: ""
-      summary: Delete prize by prize id
+      summary: Delete lobby by lobby id
       tags:
       - Prizes
     post:
@@ -66,7 +66,7 @@ paths:
           description: ""
         "400":
           description: ""
-      summary: Get prize by prize id
+      summary: Get lobby by lobby id
       tags:
       - Prizes
   /userapi/heartbeat:
