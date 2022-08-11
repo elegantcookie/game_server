@@ -89,7 +89,7 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "Lobbies Internal"
+                    "Lobbies internal"
                 ],
                 "summary": "Delete all lobbies endpoint",
                 "responses": {
