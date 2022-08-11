@@ -5,21 +5,31 @@
 <h3>API Gateway</h3>
 TODO
 
-<h3>Auth Service</h3>
+<h2>Auth Service</h2>
 host: localhost
 port: 10001
 
-<h3>User Service</h3>
+<h2>User Service</h2>
 host: localhost
 port: 10002
 
-<h3>Training Service</h3>
+<h2>Training Service</h2>
 host: localhost
 port: 10003
 
-<h3>Ticket Service</h3>
+<h2>Ticket Service</h2>
 host: localhost
 port: 10004
 
+<h2>Prize Service</h2>
+host: localhost
+port: 10005
+  
+<h2>Lobby Service</h2>
+host: localhost
+port: 10006
 
-
+<h2>Manager Service</h2>
+  <h3>Internal service</h3>
+host: localhost
+port: 10007
