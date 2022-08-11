@@ -1,0 +1,138 @@
+info:
+  contact: {}
+paths:
+  /api/lobbies:
+    patch:
+      consumes:
+      - application/json
+      produces:
+      - application/json
+      responses:
+        "204":
+          description: ""
+        "400":
+          description: ""
+      summary: Partially update lobby by lobby id
+      tags:
+      - Lobbies
+    post:
+      consumes:
+      - application/json
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: ""
+        "400":
+          description: ""
+      summary: Create lobby endpoint
+      tags:
+      - Lobbies
+  /api/lobbies/all:
+    post:
+      consumes:
+      - application/json
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: ""
+        "400":
+          description: ""
+      summary: Get all lobbies
+      tags:
+      - Lobbies
+  /api/lobbies/del/all:
+    delete:
+      consumes:
+      - application/json
+      produces:
+      - application/json
+      responses:
+        "204":
+          description: ""
+        "400":
+          description: ""
+      summary: Delete all lobbies endpoint
+      tags:
+      - Lobbies Internal
+  /api/lobbies/id/:id:
+    delete:
+      consumes:
+      - application/json
+      produces:
+      - application/json
+      responses:
+        "204":
+          description: ""
+        "400":
+          description: ""
+      summary: Delete lobby by lobby id
+      tags:
+      - Lobbies
+    post:
+      consumes:
+      - application/json
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: ""
+        "400":
+          description: ""
+      summary: Get lobby by lobby id
+      tags:
+      - Lobbies
+  /api/lobbies/join:
+    post:
+      consumes:
+      - application/json
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: ""
+        "400":
+          description: ""
+      summary: adds user to lobby by userID, lobbyID and ticketID
+      tags:
+      - Lobbies
+  /api/lobbies/params:
+    post:
+      consumes:
+      - application/json
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: ""
+        "400":
+          description: ""
+      summary: return lobbyID by game_type, prize_sum and max_players
+      tags:
+      - Lobbies
+  /api/lobbies/time/:id:
+    post:
+      consumes:
+      - application/json
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: ""
+        "400":
+          description: ""
+      summary: gets lobby by id, updates lobby time and returns new time to be checked
+      tags:
+      - Lobbies internal
+  /userapi/heartbeat:
+    get:
+      responses:
+        "204":
+          description: ""
+        "400":
+          description: ""
+      summary: Heartbeat metric
+      tags:
+      - Metrics
+swagger: "2.0"

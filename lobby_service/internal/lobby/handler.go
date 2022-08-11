@@ -35,7 +35,7 @@ func (h *Handler) Register(router *httprouter.Router) {
 	router.HandlerFunc(http.MethodPost, joinLobbyURL, auth.Middleware(h.JoinLobby))
 	router.HandlerFunc(http.MethodPost, getLobbyIDByParamsURL, auth.Middleware(h.GetLobbyIDByParams))
 	router.HandlerFunc(http.MethodPut, updateTime, auth.NoAuthMiddleware(h.UpdateLobbyTime))
-	router.HandlerFunc(http.MethodDelete, recreateUrl, auth.NoAuthMiddleware(h.RecreateLobby))
+	//router.HandlerFunc(http.MethodDelete, recreateUrl, auth.NoAuthMiddleware(h.RecreateLobby))
 	router.HandlerFunc(http.MethodDelete, deleteAllURL, auth.Middleware(h.DeleteAll))
 
 }
@@ -44,7 +44,7 @@ func (h *Handler) Register(router *httprouter.Router) {
 // @Summary Create lobby endpoint
 // @Accept json
 // @Produce json
-// @Tags Lobbys
+// @Tags Lobbies
 // @Success 201
 // @Failure 400
 // @Router /api/lobbies [post]
@@ -78,7 +78,7 @@ func (h *Handler) CreateLobby(w http.ResponseWriter, r *http.Request) error {
 // @Summary Get lobby by lobby id
 // @Accept json
 // @Produce json
-// @Tags Lobbys
+// @Tags Lobbies
 // @Success 200
 // @Failure 400
 // @Router /api/lobbies/id/:id [post]
@@ -105,11 +105,11 @@ func (h *Handler) GetLobbyById(w http.ResponseWriter, r *http.Request) error {
 	return nil
 }
 
-// Get lobbies
+// Gets lobbies
 // @Summary Get all lobbies
 // @Accept json
 // @Produce json
-// @Tags Lobbys
+// @Tags Lobbies
 // @Success 200
 // @Failure 400
 // @Router /api/lobbies/all [post]
@@ -132,11 +132,11 @@ func (h *Handler) GetLobbys(w http.ResponseWriter, r *http.Request) error {
 	return nil
 }
 
-// Partially update lobby
+// Partially updates lobby
 // @Summary Partially update lobby by lobby id
 // @Accept json
 // @Produce json
-// @Tags Lobbys
+// @Tags Lobbies
 // @Success 204
 // @Failure 400
 // @Router /api/lobbies [patch]
@@ -158,56 +158,56 @@ func (h *Handler) PartiallyUpdateLobby(w http.ResponseWriter, r *http.Request) e
 	return nil
 }
 
-// Delete lobby
+//// Delete lobby
+//// @Summary Delete lobby by lobby id
+//// @Accept json
+//// @Produce json
+//// @Tags Lobbies
+//// @Success 204
+//// @Failure 400
+//// @Router /api/lobbies/rc/id/:id [delete]
+//func (h *Handler) RecreateLobby(w http.ResponseWriter, r *http.Request) error {
+//	h.Logger.Info("DELETE AND CREATE LOBBY")
+//	w.Header().Set("Content-Type", "application/json")
+//
+//	params := r.Context().Value(httprouter.ParamsKey).(httprouter.Params)
+//	id := params.ByName("id")
+//
+//	lobby, err := h.LobbyService.GetById(r.Context(), id)
+//	if err != nil {
+//		return err
+//	}
+//
+//	dto := LobbyDTO{
+//		GameType:    lobby.GameType,
+//		MaxPlayers:  lobby.MaxPlayers,
+//		NowPlayers:  0,
+//		TicketPrice: lobby.TicketPrice,
+//		PrizeSum:    lobby.PrizeSum,
+//		PrizeType:   lobby.PrizeType,
+//		StartTime:   lobby.StartTime,
+//		EndTime:     lobby.EndTime,
+//		JWTToken:    r.Header.Get("Authorization"),
+//	}
+//	_, err = h.LobbyService.Create(r.Context(), dto)
+//	if err != nil {
+//		return fmt.Errorf("failed to create lobby due to: %v", err)
+//	}
+//
+//	err = h.LobbyService.Delete(r.Context(), id)
+//	if err != nil {
+//		return err
+//	}
+//	w.WriteHeader(http.StatusNoContent)
+//
+//	return nil
+//}
+
+// DeleteLobby deletes lobby
 // @Summary Delete lobby by lobby id
 // @Accept json
 // @Produce json
-// @Tags Lobbys
-// @Success 204
-// @Failure 400
-// @Router /api/lobbies/rc/id/:id [delete]
-func (h *Handler) RecreateLobby(w http.ResponseWriter, r *http.Request) error {
-	h.Logger.Info("DELETE AND CREATE LOBBY")
-	w.Header().Set("Content-Type", "application/json")
-
-	params := r.Context().Value(httprouter.ParamsKey).(httprouter.Params)
-	id := params.ByName("id")
-
-	lobby, err := h.LobbyService.GetById(r.Context(), id)
-	if err != nil {
-		return err
-	}
-
-	dto := LobbyDTO{
-		GameType:    lobby.GameType,
-		MaxPlayers:  lobby.MaxPlayers,
-		NowPlayers:  0,
-		TicketPrice: lobby.TicketPrice,
-		PrizeSum:    lobby.PrizeSum,
-		PrizeType:   lobby.PrizeType,
-		StartTime:   lobby.StartTime,
-		EndTime:     lobby.EndTime,
-		JWTToken:    r.Header.Get("Authorization"),
-	}
-	_, err = h.LobbyService.Create(r.Context(), dto)
-	if err != nil {
-		return fmt.Errorf("failed to create lobby due to: %v", err)
-	}
-
-	err = h.LobbyService.Delete(r.Context(), id)
-	if err != nil {
-		return err
-	}
-	w.WriteHeader(http.StatusNoContent)
-
-	return nil
-}
-
-// Delete lobby
-// @Summary Delete lobby by lobby id
-// @Accept json
-// @Produce json
-// @Tags Lobbys
+// @Tags Lobbies
 // @Success 204
 // @Failure 400
 // @Router /api/lobbies/id/:id [delete]
@@ -228,6 +228,14 @@ func (h *Handler) DeleteLobby(w http.ResponseWriter, r *http.Request) error {
 	return nil
 }
 
+// DeleteAll deletes all lobbies
+// @Summary Delete all lobbies endpoint
+// @Accept json
+// @Produce json
+// @Tags Lobbies Internal
+// @Success 204
+// @Failure 400
+// @Router /api/lobbies/del/all [delete]
 func (h *Handler) DeleteAll(w http.ResponseWriter, r *http.Request) error {
 	h.Logger.Info("DELETE ALL")
 	w.Header().Set("Content-Type", "application/json")
@@ -241,6 +249,14 @@ func (h *Handler) DeleteAll(w http.ResponseWriter, r *http.Request) error {
 	return nil
 }
 
+// JoinLobby handles join lobby function
+// @Summary adds user to lobby by userID, lobbyID and ticketID
+// @Accept json
+// @Produce json
+// @Tags Lobbies
+// @Success 200
+// @Failure 400
+// @Router /api/lobbies/join [post]
 func (h *Handler) JoinLobby(w http.ResponseWriter, r *http.Request) error {
 	h.Logger.Info("JOIN LOBBY")
 	w.Header().Set("Content-Type", "application/json")
@@ -259,6 +275,14 @@ func (h *Handler) JoinLobby(w http.ResponseWriter, r *http.Request) error {
 	return nil
 }
 
+// GetLobbyIDByParams returns lobbyID of lobby with the closest start_time to current time
+// @Summary return lobbyID by game_type, prize_sum and max_players
+// @Accept json
+// @Produce json
+// @Tags Lobbies
+// @Success 200
+// @Failure 400
+// @Router /api/lobbies/params [post]
 func (h *Handler) GetLobbyIDByParams(w http.ResponseWriter, r *http.Request) error {
 	w.Header().Set("Content-Type", "application/json")
 	var params Params
@@ -281,6 +305,14 @@ func (h *Handler) GetLobbyIDByParams(w http.ResponseWriter, r *http.Request) err
 	return err
 }
 
+// UpdateLobbyTime updates lobby time and creates new lobby with same params
+// @Summary gets lobby by id, updates lobby time and returns new time to be checked
+// @Accept json
+// @Produce json
+// @Tags Lobbies internal
+// @Success 200
+// @Failure 400
+// @Router /api/lobbies/time/:id [post]
 func (h *Handler) UpdateLobbyTime(w http.ResponseWriter, r *http.Request) error {
 	h.Logger.Println("UPDATE LOBBY TIME")
 	w.Header().Set("Content-Type", "application/json")
