@@ -11,6 +11,15 @@ type Lobby struct {
 	Players     []Player `json:"players" bson:"players"`
 	StartTime   int64    `json:"start_time" bson:"start_time"`
 	EndTime     int64    `json:"end_time" bson:"end_time"`
+	JWTToken    string   `json:"-" bson:"-"`
+}
+
+func GetPlayersIDS(lobby Lobby) []string {
+	var ids []string
+	for i := 0; i < len(lobby.Players); i++ {
+		ids = append(ids, lobby.Players[i].ID)
+	}
+	return ids
 }
 
 type Player struct {
@@ -68,4 +77,10 @@ type Params struct {
 type UpdateTimeDTO struct {
 	ID       string `json:"id"`
 	JWTToken string `json:"-"`
+}
+
+type CreateGSDTO struct {
+	Players   []string `json:"players"`
+	StartTime int64    `json:"start_time"`
+	EndTime   int64    `json:"end_time"`
 }

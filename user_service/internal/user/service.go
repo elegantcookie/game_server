@@ -167,7 +167,7 @@ func (s service) AddTicket(ctx context.Context, dto TicketDTO) error {
 	if gtFound {
 		_, found := getTicketID(dto.TicketID, user.Tickets[i])
 		if found {
-			return fmt.Errorf("ticket is already in list")
+			return fmt.Errorf("user is already in list")
 		}
 		user.Tickets[i].IDsOfGT = append(user.Tickets[i].IDsOfGT, dto.TicketID)
 		user.Tickets[i].Amount += 1
@@ -202,7 +202,7 @@ func (s service) DeleteTicket(ctx context.Context, dto TicketDTO) error {
 	if gtFound {
 		j, found := getTicketID(dto.TicketID, user.Tickets[i])
 		if !found {
-			return fmt.Errorf("ticket with id: %s not found", dto.TicketID)
+			return fmt.Errorf("user with id: %s not found", dto.TicketID)
 		}
 		user.Tickets[i].IDsOfGT = append(user.Tickets[i].IDsOfGT[:j], user.Tickets[i].IDsOfGT[j+1:]...)
 		user.Tickets[i].Amount -= 1

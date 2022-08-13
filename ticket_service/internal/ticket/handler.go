@@ -232,7 +232,7 @@ func (h *Handler) UseTicket(w http.ResponseWriter, r *http.Request) error {
 	userID := params.ByName("id")
 	err := h.TicketService.UseTicket(r.Context(), userID)
 	if err != nil {
-		return fmt.Errorf("failed to use ticket due to: %v", err)
+		return fmt.Errorf("failed to use snake due to: %v", err)
 	}
 	w.WriteHeader(http.StatusOK)
 	return nil
