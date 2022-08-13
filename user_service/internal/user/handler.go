@@ -250,8 +250,8 @@ func (h *Handler) DeleteUser(w http.ResponseWriter, r *http.Request) error {
 	return nil
 }
 
-// Add ticket
-// @Summary Add ticket by user id and ticket id
+// Add snake
+// @Summary Add snake by user id and snake id
 // @Accept json
 // @Produce json
 // @Tags Tickets
@@ -270,15 +270,15 @@ func (h *Handler) AddTicket(w http.ResponseWriter, r *http.Request) error {
 	}
 	err = h.UserService.AddTicket(r.Context(), dto)
 	if err != nil {
-		return fmt.Errorf("unable to add ticket due to: %v", err)
+		return fmt.Errorf("unable to add snake due to: %v", err)
 	}
 	w.WriteHeader(http.StatusCreated)
 
 	return nil
 }
 
-// Delete ticket
-// @Summary Delete ticket by user id and ticket id
+// Delete snake
+// @Summary Delete snake by user id and snake id
 // @Accept json
 // @Produce json
 // @Tags Tickets
@@ -297,15 +297,15 @@ func (h *Handler) DeleteTicket(w http.ResponseWriter, r *http.Request) error {
 	}
 	err = h.UserService.DeleteTicket(r.Context(), dto)
 	if err != nil {
-		return fmt.Errorf("unable to delete ticket due to: %v", err)
+		return fmt.Errorf("unable to delete snake due to: %v", err)
 	}
 	w.WriteHeader(http.StatusNoContent)
 
 	return nil
 }
 
-// Get ticket status
-// @Summary Get ticket status
+// Get snake status
+// @Summary Get snake status
 // @Accept json
 // @Produce json
 // @Tags Tickets
