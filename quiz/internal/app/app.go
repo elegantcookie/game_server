@@ -12,12 +12,12 @@ import (
 	"os"
 	"path"
 	"path/filepath"
-	"snake_service/internal/config"
-	"snake_service/internal/snake"
-	"snake_service/internal/snake/db"
-	"snake_service/pkg/client/mongodb"
-	"snake_service/pkg/logging"
-	"snake_service/pkg/metrics"
+	"quiz_service/internal/config"
+	"quiz_service/internal/quiz"
+	"quiz_service/internal/quiz/db"
+	"quiz_service/pkg/client/mongodb"
+	"quiz_service/pkg/logging"
+	"quiz_service/pkg/metrics"
 	"time"
 )
 
@@ -47,12 +47,12 @@ func NewApp(cfg *config.Config, logger *logging.Logger) (App, error) {
 	}
 
 	storage := db.NewStorage(mongodbClient, "quiz", logger)
-	service, err := snake.NewService(storage, *logger)
+	service, err := quiz.NewService(storage, *logger)
 	if err != nil {
 		panic(err)
 	}
 
-	usersHandler := snake.Handler{
+	usersHandler := quiz.Handler{
 		Logger:      logging.GetLogger(cfg.AppConfig.LogLevel),
 		GameService: service,
 	}
