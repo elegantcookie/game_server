@@ -102,6 +102,7 @@ func (d *db) Create(ctx context.Context, dto table.RecordDTO) (string, error) {
 	record := table.Record{
 		ID:        dto.ID,
 		UserID:    dto.UserID,
+		Username:  dto.Username,
 		UserScore: dto.UserScore,
 	}
 	collection := d.database.Collection(dto.TableName)
@@ -218,6 +219,7 @@ func (d *db) Update(ctx context.Context, dto table.RecordDTO) error {
 	record := table.Record{
 		ID:        dto.ID,
 		UserID:    dto.UserID,
+		Username:  dto.Username,
 		UserScore: dto.UserScore,
 	}
 	tableName := dto.TableName
