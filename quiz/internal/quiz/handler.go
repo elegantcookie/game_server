@@ -1,4 +1,4 @@
-package snake
+package quiz
 
 import (
 	"context"
@@ -7,13 +7,13 @@ import (
 	"github.com/julienschmidt/httprouter"
 	"log"
 	"net/http"
-	"snake_service/internal/auth"
-	"snake_service/pkg/logging"
+	"quiz_service/internal/auth"
+	"quiz_service/pkg/logging"
 )
 
 var (
 	gameServersUrl  = "/api/quiz/"
-	getAllSnakesUrl = "/api/quiz/all/"
+	getAllQuizsUrl  = "/api/quiz/all/"
 	gameServerIDUrl = "/api/quiz/id/:id"
 	sendResultURL   = "/api/quiz/res/"
 	getStatusURL    = "/api/quiz/status/:id"
@@ -27,7 +27,7 @@ type Handler struct {
 func (h *Handler) Register(router *httprouter.Router) {
 	router.HandlerFunc(http.MethodPost, gameServersUrl, auth.Middleware(h.CreateGS))
 	router.HandlerFunc(http.MethodPost, gameServerIDUrl, auth.Middleware(h.GetGSById))
-	router.HandlerFunc(http.MethodPost, getAllSnakesUrl, auth.Middleware(h.GetGameServers))
+	router.HandlerFunc(http.MethodPost, getAllQuizsUrl, auth.Middleware(h.GetGameServers))
 	router.HandlerFunc(http.MethodDelete, gameServerIDUrl, auth.Middleware(h.DeleteGS))
 	router.HandlerFunc(http.MethodPut, gameServersUrl, auth.Middleware(h.PartiallyUpdateGS))
 	router.HandlerFunc(http.MethodPost, sendResultURL, auth.Middleware(h.SendResult))
@@ -38,7 +38,7 @@ func (h *Handler) Register(router *httprouter.Router) {
 // @Summary Create game server endpoint
 // @Accept json
 // @Produce json
-// @Tags Snakes
+// @Tags Quizs
 // @Success 201
 // @Failure 400
 // @Router /api/snakes [post]
@@ -46,7 +46,7 @@ func (h *Handler) CreateGS(w http.ResponseWriter, r *http.Request) error {
 	h.Logger.Info("POST CREATE GAME SERVER")
 	w.Header().Set("Content-Type", "application/json")
 
-	var dto SnakeDTO
+	var dto QuizDTO
 	defer r.Body.Close()
 	err := json.NewDecoder(r.Body).Decode(&dto)
 	if err != nil {
@@ -72,7 +72,7 @@ func (h *Handler) CreateGS(w http.ResponseWriter, r *http.Request) error {
 // @Summary Get game server by game server id
 // @Accept json
 // @Produce json
-// @Tags Snakes
+// @Tags Quizs
 // @Success 200
 // @Failure 400
 // @Router /api/snakes/get/id [post]
@@ -102,7 +102,7 @@ func (h *Handler) GetGSById(w http.ResponseWriter, r *http.Request) error {
 // @Summary Get all snakes
 // @Accept json
 // @Produce json
-// @Tags Snakes
+// @Tags Quizs
 // @Success 200
 // @Failure 400
 // @Router /api/snakes/get/all [post]
@@ -131,7 +131,7 @@ func (h *Handler) GetGameServers(w http.ResponseWriter, r *http.Request) error {
 // @Summary Partially update game server by user id
 // @Accept json
 // @Produce json
-// @Tags Snakes
+// @Tags Quizs
 // @Success 204
 // @Failure 400
 // @Router /api/snakes [patch]
@@ -139,7 +139,7 @@ func (h *Handler) PartiallyUpdateGS(w http.ResponseWriter, r *http.Request) erro
 	h.Logger.Info("PARTIALLY UPDATE GAME SERVER")
 	w.Header().Set("Content-Type", "application/json")
 
-	var snake Snake
+	var snake Quiz
 	defer r.Body.Close()
 	if err := json.NewDecoder(r.Body).Decode(&snake); err != nil {
 		return auth.BadRequestError("invalid JSON scheme. check swagger API")
@@ -157,7 +157,7 @@ func (h *Handler) PartiallyUpdateGS(w http.ResponseWriter, r *http.Request) erro
 // @Summary Delete game server by game server id
 // @Accept json
 // @Produce json
-// @Tags Snakes
+// @Tags Quizs
 // @Success 204
 // @Failure 400
 // @Router /api/snakes [delete]

@@ -219,7 +219,7 @@ func UseTicket(ctx context.Context, ticketID string) error {
 		if err != nil {
 			return err
 		}
-		return fmt.Errorf("failed to use snake due to: %s", string(bytes))
+		return fmt.Errorf("failed to use lobby due to: %s", string(bytes))
 	}
 	return nil
 }
@@ -269,7 +269,7 @@ func (s service) RecreateLobby(ctx context.Context, dto LobbyDTO, lobbyID string
 }
 
 func (s service) CreateSnakeGS(lobby Lobby) error {
-	log.Println("CREATE GAME SERVER")
+	log.Println("CREATE SNAKE GAME SERVER")
 	log.Printf("%v", lobby)
 	ids := GetPlayersIDS(lobby)
 	var dto CreateGSDTO
@@ -281,7 +281,7 @@ func (s service) CreateSnakeGS(lobby Lobby) error {
 	if err != nil {
 		return fmt.Errorf("failed to marshal data due to: %v", err)
 	}
-	request, err := http.NewRequest(http.MethodPost, createGameServerURL, io.NopCloser(strings.NewReader(string(bytes))))
+	request, err := http.NewRequest(http.MethodPost, createSnakeGSURL, io.NopCloser(strings.NewReader(string(bytes))))
 	if err != nil {
 		return fmt.Errorf("failed to create new request due to: %v", err)
 	}
@@ -302,7 +302,41 @@ func (s service) CreateSnakeGS(lobby Lobby) error {
 	return nil
 }
 
-// AddUserToLobby needs check if user has such snake.
+func (s service) CreateQuizGS(lobby Lobby) error {
+	log.Println("CREATE QUIZ GAME SERVER")
+	log.Printf("%v", lobby)
+	ids := GetPlayersIDS(lobby)
+	var dto CreateGSDTO
+	dto.Players = ids
+	dto.StartTime = lobby.StartTime
+	dto.EndTime = lobby.EndTime
+
+	bytes, err := json.Marshal(dto)
+	if err != nil {
+		return fmt.Errorf("failed to marshal data due to: %v", err)
+	}
+	request, err := http.NewRequest(http.MethodPost, createQuizGSURL, io.NopCloser(strings.NewReader(string(bytes))))
+	if err != nil {
+		return fmt.Errorf("failed to create new request due to: %v", err)
+	}
+
+	request.Header.Add("Authorization", lobby.JWTToken)
+
+	var client http.Client
+	response, err := client.Do(request)
+	if err != nil {
+		return fmt.Errorf("failed to do request due to: %v", err)
+	}
+	if response == nil {
+		return fmt.Errorf("response is nil")
+	}
+	if response.StatusCode != http.StatusCreated {
+		return fmt.Errorf("failed status code: %d", response.StatusCode)
+	}
+	return nil
+}
+
+// AddUserToLobby needs check if user has such lobby.
 // Or check must be on client
 func (s service) AddUserToLobby(ctx context.Context, dto JoinLobbyDTO) error {
 	s.logger.Println("GOT INTO addUserToLobby")
@@ -344,12 +378,12 @@ func (s service) AddUserToLobby(ctx context.Context, dto JoinLobbyDTO) error {
 		}
 		err = UpdateUserTicket(ctx, lobby.GameType, userDTO)
 		if err != nil {
-			return fmt.Errorf("failed to update user snake due to: %v", err)
+			return fmt.Errorf("failed to update user lobby due to: %v", err)
 		}
 
 		err = UseTicket(ctx, dto.TicketID)
 		if err != nil {
-			return fmt.Errorf("failed to use snake due to: %v", err)
+			return fmt.Errorf("failed to use lobby due to: %v", err)
 		}
 
 		lobby.Players = append(lobby.Players, Player{
@@ -391,6 +425,13 @@ func (s service) AddUserToLobby(ctx context.Context, dto JoinLobbyDTO) error {
 				err := s.CreateSnakeGS(lobby)
 				if err != nil {
 					return fmt.Errorf("failed to create snake game server due to: %v", err)
+				}
+			}
+		case "quiz":
+			{
+				err := s.CreateQuizGS(lobby)
+				if err != nil {
+					return fmt.Errorf("failed to create quiz game server due to: %v", err)
 				}
 			}
 		}
