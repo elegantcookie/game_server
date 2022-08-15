@@ -31,7 +31,7 @@ type Service interface {
 	GetById(ctx context.Context, id string) (lobby LobbyRecord, err error)
 	GetAll(ctx context.Context) ([]LobbyRecord, error)
 	UpdateLR(ctx context.Context, lr LobbyRecord) error
-	UpdateTime(ctx context.Context, id string) (int64, error)
+	UpdateTime(ctx context.Context, lr LobbyRecord) (int64, error)
 	Delete(ctx context.Context, id string) error
 	DeleteAll(ctx context.Context) error
 }
@@ -73,8 +73,14 @@ func (s service) UpdateLR(ctx context.Context, lr LobbyRecord) error {
 	return nil
 }
 
-func (s service) UpdateTime(ctx context.Context, id string) (int64, error) {
-	u := fmt.Sprintf("http://localhost:10006/api/lobbies/time/%s", id)
+func (s service) UpdateTime(ctx context.Context, lr LobbyRecord) (int64, error) {
+	var u string
+	switch lr.Type {
+	case lobby:
+		u = fmt.Sprintf(updateLobbyTime, lr.LobbyID)
+	case qualification:
+		u = fmt.Sprintf(updateQualificationTime, lr.GameType)
+	}
 	request, err := http.NewRequestWithContext(ctx, http.MethodPut, u, nil)
 	if err != nil {
 		return 0, err
