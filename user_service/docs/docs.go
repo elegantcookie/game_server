@@ -48,12 +48,29 @@ const docTemplate = `{
                     "Users"
                 ],
                 "summary": "Create user endpoint",
+                "parameters": [
+                    {
+                        "description": "create user struct",
+                        "name": "data",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/user.CreateUserDTO"
+                        }
+                    }
+                ],
                 "responses": {
                     "201": {
                         "description": ""
                     },
                     "400": {
                         "description": ""
+                    },
+                    "418": {
+                        "description": "I'm a teapot",
+                        "schema": {
+                            "$ref": "#/definitions/apperror.AppError"
+                        }
                     }
                 }
             },
@@ -68,12 +85,27 @@ const docTemplate = `{
                     "Users"
                 ],
                 "summary": "Delete user by id endpoint",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "User ID",
+                        "name": "asd",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
                 "responses": {
                     "204": {
                         "description": ""
                     },
                     "400": {
                         "description": ""
+                    },
+                    "418": {
+                        "description": "I'm a teapot",
+                        "schema": {
+                            "$ref": "#/definitions/apperror.AppError"
+                        }
                     }
                 }
             },
@@ -88,12 +120,29 @@ const docTemplate = `{
                     "Users"
                 ],
                 "summary": "Partially update user endpoint",
+                "parameters": [
+                    {
+                        "description": "update user struct",
+                        "name": "data",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/user.UpdateUserDTO"
+                        }
+                    }
+                ],
                 "responses": {
                     "204": {
                         "description": ""
                     },
                     "400": {
                         "description": ""
+                    },
+                    "418": {
+                        "description": "I'm a teapot",
+                        "schema": {
+                            "$ref": "#/definitions/apperror.AppError"
+                        }
                     }
                 }
             }
@@ -116,6 +165,12 @@ const docTemplate = `{
                     },
                     "400": {
                         "description": ""
+                    },
+                    "418": {
+                        "description": "I'm a teapot",
+                        "schema": {
+                            "$ref": "#/definitions/apperror.AppError"
+                        }
                     }
                 }
             }
@@ -138,6 +193,12 @@ const docTemplate = `{
                     },
                     "400": {
                         "description": ""
+                    },
+                    "418": {
+                        "description": "I'm a teapot",
+                        "schema": {
+                            "$ref": "#/definitions/apperror.AppError"
+                        }
                     }
                 }
             }
@@ -153,13 +214,30 @@ const docTemplate = `{
                 "tags": [
                     "Tickets"
                 ],
-                "summary": "Add lobby by user id and lobby id",
+                "summary": "Add user by user id and user id",
+                "parameters": [
+                    {
+                        "description": "ticket dto struct",
+                        "name": "data",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/user.TicketDTO"
+                        }
+                    }
+                ],
                 "responses": {
                     "201": {
                         "description": ""
                     },
                     "400": {
                         "description": ""
+                    },
+                    "418": {
+                        "description": "I'm a teapot",
+                        "schema": {
+                            "$ref": "#/definitions/apperror.AppError"
+                        }
                     }
                 }
             },
@@ -173,18 +251,33 @@ const docTemplate = `{
                 "tags": [
                     "Tickets"
                 ],
-                "summary": "Delete lobby by user id and lobby id",
+                "summary": "Delete user by user id and user id",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "User ID",
+                        "name": "data",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
                 "responses": {
                     "204": {
                         "description": ""
                     },
                     "400": {
                         "description": ""
+                    },
+                    "418": {
+                        "description": "I'm a teapot",
+                        "schema": {
+                            "$ref": "#/definitions/apperror.AppError"
+                        }
                     }
                 }
             }
         },
-        "/api/users/tickets/free/:id": {
+        "/api/users/tickets/free/{id}": {
             "post": {
                 "consumes": [
                     "application/json"
@@ -195,13 +288,28 @@ const docTemplate = `{
                 "tags": [
                     "Tickets"
                 ],
-                "summary": "Get lobby status",
+                "summary": "Get user status",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Ticket ID",
+                        "name": "ticket_id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
                 "responses": {
                     "200": {
                         "description": ""
                     },
-                    "400": {
+                    "404": {
                         "description": ""
+                    },
+                    "418": {
+                        "description": "I'm a teapot",
+                        "schema": {
+                            "$ref": "#/definitions/apperror.AppError"
+                        }
                     }
                 }
             }
@@ -224,6 +332,12 @@ const docTemplate = `{
                     },
                     "400": {
                         "description": ""
+                    },
+                    "418": {
+                        "description": "I'm a teapot",
+                        "schema": {
+                            "$ref": "#/definitions/apperror.AppError"
+                        }
                     }
                 }
             }
@@ -241,6 +355,84 @@ const docTemplate = `{
                     "400": {
                         "description": ""
                     }
+                }
+            }
+        }
+    },
+    "definitions": {
+        "apperror.AppError": {
+            "type": "object",
+            "properties": {
+                "code": {
+                    "type": "string"
+                },
+                "developer_message": {
+                    "type": "string"
+                },
+                "message": {
+                    "type": "string"
+                }
+            }
+        },
+        "user.CreateUserDTO": {
+            "type": "object",
+            "properties": {
+                "password": {
+                    "type": "string"
+                },
+                "username": {
+                    "type": "string"
+                }
+            }
+        },
+        "user.GameTickets": {
+            "type": "object",
+            "properties": {
+                "amount": {
+                    "type": "integer"
+                },
+                "game_type": {
+                    "type": "string"
+                },
+                "tickets_of_gt": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                }
+            }
+        },
+        "user.TicketDTO": {
+            "type": "object",
+            "properties": {
+                "game_type": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "string"
+                },
+                "ticket_id": {
+                    "type": "string"
+                }
+            }
+        },
+        "user.UpdateUserDTO": {
+            "type": "object",
+            "properties": {
+                "has_free_ticket": {
+                    "type": "boolean"
+                },
+                "id": {
+                    "type": "string"
+                },
+                "tickets": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/user.GameTickets"
+                    }
+                },
+                "username": {
+                    "type": "string"
                 }
             }
         }

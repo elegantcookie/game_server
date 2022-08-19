@@ -44,6 +44,7 @@ func (h *Handler) Register(router *httprouter.Router) {
 // @Tags Users
 // @Success 200
 // @Failure 400
+// @Failure 418 {object} apperror.AppError
 // @Router /api/users/id/:id [post]
 func (h *Handler) GetUserById(w http.ResponseWriter, r *http.Request) error {
 	h.Logger.Info("GET USER BY ID")
@@ -76,6 +77,7 @@ func (h *Handler) GetUserById(w http.ResponseWriter, r *http.Request) error {
 // @Tags Users
 // @Success 200
 // @Failure 400
+// @Failure 418 {object} apperror.AppError
 // @Router /api/users/username/:username [post]
 func (h *Handler) GetUserByUsername(w http.ResponseWriter, r *http.Request) error {
 	h.Logger.Info("GET USER BY USERNAME")
@@ -108,6 +110,7 @@ func (h *Handler) GetUserByUsername(w http.ResponseWriter, r *http.Request) erro
 // @Tags Users
 // @Success 200
 // @Failure 400
+// @Failure 418 {object} apperror.AppError
 // @Router /api/users/auth [post]
 func (h *Handler) GetUserByUsernameAndPassword(w http.ResponseWriter, r *http.Request) error {
 	w.Header().Set("Content-Type", "application/json")
@@ -172,9 +175,11 @@ func (h *Handler) GetUsers(w http.ResponseWriter, r *http.Request) error {
 // @Summary Create user endpoint
 // @Accept json
 // @Produce json
+// @Param data body CreateUserDTO true "create user struct"
 // @Tags Users
 // @Success 201
 // @Failure 400
+// @Failure 418 {object} apperror.AppError
 // @Router /api/users [post]
 func (h *Handler) CreateUser(w http.ResponseWriter, r *http.Request) error {
 	h.Logger.Info("CREATE USER")
@@ -202,9 +207,11 @@ func (h *Handler) CreateUser(w http.ResponseWriter, r *http.Request) error {
 // @Summary Partially update user endpoint
 // @Accept json
 // @Produce json
+// @Param data body UpdateUserDTO true "update user struct"
 // @Tags Users
 // @Success 204
 // @Failure 400
+// @Failure 418 {object} apperror.AppError
 // @Router /api/users [patch]
 func (h *Handler) PartiallyUpdateUser(w http.ResponseWriter, r *http.Request) error {
 	h.Logger.Info("PARTIALLY UPDATE USER")
@@ -229,9 +236,11 @@ func (h *Handler) PartiallyUpdateUser(w http.ResponseWriter, r *http.Request) er
 // @Summary Delete user by id endpoint
 // @Accept json
 // @Produce json
+// @Param asd path string true "User ID"
 // @Tags Users
 // @Success 204
 // @Failure 400
+// @Failure 418 {object} apperror.AppError
 // @Router /api/users [delete]
 func (h *Handler) DeleteUser(w http.ResponseWriter, r *http.Request) error {
 	h.Logger.Info("DELETE USER")
@@ -254,9 +263,11 @@ func (h *Handler) DeleteUser(w http.ResponseWriter, r *http.Request) error {
 // @Summary Add user by user id and user id
 // @Accept json
 // @Produce json
+// @Param data body TicketDTO true "ticket dto struct"
 // @Tags Tickets
 // @Success 201
 // @Failure 400
+// @Failure 418 {object} apperror.AppError
 // @Router /api/users/tickets [put]
 func (h *Handler) AddTicket(w http.ResponseWriter, r *http.Request) error {
 	h.Logger.Info("POST ADD TICKET")
@@ -281,9 +292,11 @@ func (h *Handler) AddTicket(w http.ResponseWriter, r *http.Request) error {
 // @Summary Delete user by user id and user id
 // @Accept json
 // @Produce json
+// @Param data path string true "User ID"
 // @Tags Tickets
 // @Success 204
 // @Failure 400
+// @Failure 418 {object} apperror.AppError
 // @Router /api/users/tickets [delete]
 func (h *Handler) DeleteTicket(w http.ResponseWriter, r *http.Request) error {
 	h.Logger.Info("DELETE TICKET")
@@ -308,10 +321,12 @@ func (h *Handler) DeleteTicket(w http.ResponseWriter, r *http.Request) error {
 // @Summary Get user status
 // @Accept json
 // @Produce json
+// @Param ticket_id path string true "Ticket ID"
 // @Tags Tickets
 // @Success 200
-// @Failure 400
-// @Router /api/users/tickets/free/:id [post]
+// @Failure 404
+// @Failure 418 {object} apperror.AppError
+// @Router /api/users/tickets/free/{id} [post]
 func (h *Handler) GetFreeTicketStatus(w http.ResponseWriter, r *http.Request) error {
 	w.Header().Set("Content-Type", "application/json")
 
