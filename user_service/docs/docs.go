@@ -159,6 +159,17 @@ const docTemplate = `{
                     "Users"
                 ],
                 "summary": "Get user by username and password. Needs for authorization",
+                "parameters": [
+                    {
+                        "description": "create user struct",
+                        "name": "data",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/user.CreateUserDTO"
+                        }
+                    }
+                ],
                 "responses": {
                     "200": {
                         "description": ""
@@ -175,7 +186,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/api/users/id/:id": {
+        "/api/users/id/{id}": {
             "post": {
                 "consumes": [
                     "application/json"
@@ -187,6 +198,15 @@ const docTemplate = `{
                     "Users"
                 ],
                 "summary": "Get user by user id",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "User ID",
+                        "name": "user_id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
                 "responses": {
                     "200": {
                         "description": ""
@@ -314,7 +334,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/api/users/username/:username": {
+        "/api/users/username/{username}": {
             "post": {
                 "consumes": [
                     "application/json"
@@ -326,6 +346,15 @@ const docTemplate = `{
                     "Users"
                 ],
                 "summary": "Get user by username endpoint",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Username",
+                        "name": "username",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
                 "responses": {
                     "200": {
                         "description": ""

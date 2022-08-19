@@ -140,6 +140,13 @@ paths:
     post:
       consumes:
       - application/json
+      parameters:
+      - description: create user struct
+        in: body
+        name: data
+        required: true
+        schema:
+          $ref: '#/definitions/user.CreateUserDTO'
       produces:
       - application/json
       responses:
@@ -154,10 +161,16 @@ paths:
       summary: Get user by username and password. Needs for authorization
       tags:
       - Users
-  /api/users/id/:id:
+  /api/users/id/{id}:
     post:
       consumes:
       - application/json
+      parameters:
+      - description: User ID
+        in: path
+        name: user_id
+        required: true
+        type: string
       produces:
       - application/json
       responses:
@@ -244,10 +257,16 @@ paths:
       summary: Get user status
       tags:
       - Tickets
-  /api/users/username/:username:
+  /api/users/username/{username}:
     post:
       consumes:
       - application/json
+      parameters:
+      - description: Username
+        in: path
+        name: username
+        required: true
+        type: string
       produces:
       - application/json
       responses:

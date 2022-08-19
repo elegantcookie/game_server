@@ -41,11 +41,12 @@ func (h *Handler) Register(router *httprouter.Router) {
 // @Summary Get user by user id
 // @Accept json
 // @Produce json
+// @Param user_id path string true "User ID"
 // @Tags Users
 // @Success 200
 // @Failure 400
 // @Failure 418 {object} apperror.AppError
-// @Router /api/users/id/:id [post]
+// @Router /api/users/id/{id} [post]
 func (h *Handler) GetUserById(w http.ResponseWriter, r *http.Request) error {
 	h.Logger.Info("GET USER BY ID")
 	w.Header().Set("Content-Type", "application/json")
@@ -74,11 +75,12 @@ func (h *Handler) GetUserById(w http.ResponseWriter, r *http.Request) error {
 // @Summary Get user by username endpoint
 // @Accept json
 // @Produce json
+// @Param username path string true "Username"
 // @Tags Users
 // @Success 200
 // @Failure 400
 // @Failure 418 {object} apperror.AppError
-// @Router /api/users/username/:username [post]
+// @Router /api/users/username/{username} [post]
 func (h *Handler) GetUserByUsername(w http.ResponseWriter, r *http.Request) error {
 	h.Logger.Info("GET USER BY USERNAME")
 	w.Header().Set("Content-Type", "application/json")
@@ -107,6 +109,7 @@ func (h *Handler) GetUserByUsername(w http.ResponseWriter, r *http.Request) erro
 // @Summary Get user by username and password. Needs for authorization
 // @Accept json
 // @Produce json
+// @Param data body CreateUserDTO true "create user struct"
 // @Tags Users
 // @Success 200
 // @Failure 400
