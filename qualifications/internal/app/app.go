@@ -4,78 +4,34 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"github.com/cenkalti/backoff"
 	"github.com/julienschmidt/httprouter"
 	"github.com/rs/cors"
 	httpSwagger "github.com/swaggo/http-swagger"
-	"log"
-	"manager_service/internal/config"
-	"manager_service/internal/manager"
-	"manager_service/internal/manager/db"
-	"manager_service/pkg/client/mongodb"
-	"manager_service/pkg/logging"
-	"manager_service/pkg/metrics"
 	"net"
 	"net/http"
 	"os"
 	"path"
 	"path/filepath"
+	"qualifications_service/internal/config"
+	"qualifications_service/internal/table"
+	"qualifications_service/internal/table/db"
+	"qualifications_service/pkg/client/mongodb"
+	"qualifications_service/pkg/logging"
+	"qualifications_service/pkg/metrics"
 	"time"
 )
 
-type ManagerFunc func(ctx context.Context, fq *manager.FuncArray)
-
 type App struct {
-	managerFunc ManagerFunc
-	funcQueue   manager.FuncArray
-	cfg         *config.Config
-	logger      *logging.Logger
-	router      *httprouter.Router
-	httpServer  *http.Server
-}
-
-func managerFunc(ctx context.Context, fa *manager.FuncArray) {
-	bf := backoff.NewExponentialBackOff()
-	bf.InitialInterval = 2 * time.Millisecond
-	bf.MaxInterval = 10 * time.Second
-	for {
-		next := bf.NextBackOff()
-		time.Sleep(next)
-		lrs, err := fa.ManagerService.GetAll(ctx)
-		if err != nil {
-			continue
-		}
-		if len(lrs) == 0 {
-			continue
-		}
-		for _, lr := range lrs {
-			if !lr.Expired() {
-				continue
-			}
-			response, err := fa.ManagerService.UpdateTime(ctx, lr)
-			if err != nil {
-				log.Printf("failed to update time due to: %v", err)
-				continue
-			}
-			if response.Delete || response.StatusCode == http.StatusNotFound {
-				err := fa.ManagerService.Delete(ctx, lr.ID)
-				if err != nil {
-					return
-				}
-				continue
-			}
-			lr.Expiration = response.UpdatedTime
-			err = fa.Update(lr)
-			if err != nil {
-				continue
-			}
-		}
-	}
+	cfg        *config.Config
+	logger     *logging.Logger
+	router     *httprouter.Router
+	httpServer *http.Server
 }
 
 func NewApp(cfg *config.Config, logger *logging.Logger) (App, error) {
 	logger.Println("router initializing")
 	router := httprouter.New()
+
 	logger.Println("swagger docs initialization")
 	router.Handler(http.MethodGet, "/swagger", http.RedirectHandler("/swagger/index.html", http.StatusMovedPermanently))
 	router.Handler(http.MethodGet, "/swagger/*any", httpSwagger.WrapHandler)
@@ -90,21 +46,19 @@ func NewApp(cfg *config.Config, logger *logging.Logger) (App, error) {
 		panic(err)
 	}
 
-	storage := db.NewStorage(mongodbClient, "managers", logger)
-	service, err := manager.NewService(storage, *logger)
+	storage := db.NewStorage(mongodbClient, logger)
+	service, err := table.NewService(storage, *logger)
 	if err != nil {
 		panic(err)
 	}
 
-	managersHandler := manager.Handler{
-		Logger:         logging.GetLogger(cfg.AppConfig.LogLevel),
-		ManagerService: service,
+	usersHandler := table.Handler{
+		Logger:          logging.GetLogger(cfg.AppConfig.LogLevel),
+		TrainingService: service,
 	}
-	managersHandler.Register(router)
+	usersHandler.Register(router)
 
 	return App{
-		managerFunc,
-		manager.GetFuncQueue(service),
 		cfg,
 		logger,
 		router,
@@ -113,7 +67,6 @@ func NewApp(cfg *config.Config, logger *logging.Logger) (App, error) {
 }
 
 func (a *App) Run() {
-	go a.managerFunc(context.Background(), &a.funcQueue)
 	a.startHTTP()
 }
 

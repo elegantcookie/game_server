@@ -61,13 +61,15 @@ func (fq *FuncArray) Update(lr LobbyRecord) error {
 	return nil
 }
 
-//
-//func (fq *FuncArray) Pop() *Node {
-//	if fq.Head == nil {
-//		return nil
-//	}
-//	head := fq.Head
-//	fq.Head = fq.Head.Next
-//	fq.Length -= 1
-//	return head
-//}
+type LRResponse struct {
+	UpdatedTime int64
+	StatusCode  int
+	Delete      bool
+}
+
+func (r LRResponse) CorrectResponse() bool {
+	if r.StatusCode > 299 || r.StatusCode == 0 {
+		return false
+	}
+	return true
+}

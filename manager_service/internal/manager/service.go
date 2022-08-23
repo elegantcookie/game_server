@@ -31,7 +31,7 @@ type Service interface {
 	GetById(ctx context.Context, id string) (lobby LobbyRecord, err error)
 	GetAll(ctx context.Context) ([]LobbyRecord, error)
 	UpdateLR(ctx context.Context, lr LobbyRecord) error
-	UpdateTime(ctx context.Context, lr LobbyRecord) (int64, error)
+	UpdateTime(ctx context.Context, lr LobbyRecord) (LRResponse, error)
 	Delete(ctx context.Context, id string) error
 	DeleteAll(ctx context.Context) error
 }
@@ -73,38 +73,48 @@ func (s service) UpdateLR(ctx context.Context, lr LobbyRecord) error {
 	return nil
 }
 
-func (s service) UpdateTime(ctx context.Context, lr LobbyRecord) (int64, error) {
+func (s service) UpdateTime(ctx context.Context, lr LobbyRecord) (res LRResponse, err error) {
 	var u string
 	switch lr.Type {
 	case lobby:
 		u = fmt.Sprintf(updateLobbyTime, lr.LobbyID)
+		res.Delete = false
 	case qualification:
 		u = fmt.Sprintf(updateQualificationTime, lr.GameType)
+		res.Delete = true
+	// TODO delete this on release
+	default:
+		u = fmt.Sprintf(updateQualificationTime, lr.GameType)
+		res.Delete = true
 	}
 	request, err := http.NewRequestWithContext(ctx, http.MethodPut, u, nil)
 	if err != nil {
-		return 0, err
+		return res, err
 	}
 	var client http.Client
 	response, err := client.Do(request)
 	if err != nil {
-		return 0, err
+		return res, err
 	}
 
 	if response == nil {
-		return 0, fmt.Errorf("response is null")
+		return res, fmt.Errorf("response is null")
 	}
 	bytes, err := io.ReadAll(response.Body)
 	if err != nil {
-		return 0, err
+		return res, err
 	}
-
+	s.logger.Println(string(bytes))
 	var dto UpdateTimeDTO
 	err = json.Unmarshal(bytes, &dto)
 	if err != nil {
-		return 0, err
+		return res, err
 	}
-	return dto.Expiration, nil
+
+	res.StatusCode = response.StatusCode
+	res.UpdatedTime = dto.Expiration
+
+	return res, nil
 }
 
 func (s service) Delete(ctx context.Context, id string) error {
