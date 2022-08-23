@@ -1,36 +1,53 @@
+definitions:
+  table.RecordDTO:
+    properties:
+      id:
+        type: string
+      table_name:
+        type: string
+      user_id:
+        type: string
+      user_score:
+        type: string
+      username:
+        type: string
+    type: object
 info:
   contact: {}
 paths:
   /api/training:
     delete:
-      consumes:
-      - application/json
-      produces:
-      - application/json
       responses:
         "204":
           description: ""
         "400":
           description: ""
-      summary: Delete record by record id
       tags:
       - Records
     patch:
-      consumes:
-      - application/json
-      produces:
-      - application/json
       responses:
         "204":
           description: ""
         "400":
           description: ""
-      summary: Partially update record by user id
       tags:
       - Records
     post:
       consumes:
       - application/json
+      parameters:
+      - default: Bearer <Add access token here>
+        description: Insert your access token
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      - description: create record struct
+        in: body
+        name: data
+        required: true
+        schema:
+          $ref: '#/definitions/table.RecordDTO'
       produces:
       - application/json
       responses:
@@ -43,77 +60,46 @@ paths:
       - Records
   /api/training/collections:
     delete:
-      consumes:
-      - application/json
-      produces:
-      - application/json
       responses:
         "204":
           description: ""
         "400":
           description: ""
-      summary: Delete collection by collection name(table_name). Needs accept token
       tags:
       - Collections
     post:
-      consumes:
-      - application/json
-      produces:
-      - application/json
       responses:
         "201":
           description: ""
         "400":
           description: ""
-      summary: Create collection endpoint. Needs accept token
       tags:
       - Collections
   /api/training/collections/get/all:
     get:
-      consumes:
-      - application/json
-      produces:
-      - application/json
       responses:
         "200":
           description: ""
         "400":
           description: ""
-      summary: Get collection names of "training-service" db
       tags:
       - Records
-  /api/training/get/all:
+  /api/training/get/{userid}:
     post:
       consumes:
       - application/json
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: ""
-        "400":
-          description: ""
-      summary: Get all records of a lobby
-      tags:
-      - Records
-  /api/training/get/id:
-    post:
-      consumes:
-      - application/json
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: ""
-        "400":
-          description: ""
-      summary: Get record by record id
-      tags:
-      - Records
-  /api/training/get/userid:
-    post:
-      consumes:
-      - application/json
+      parameters:
+      - default: Bearer <Add access token here>
+        description: Insert your access token
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      - description: User ID
+        in: path
+        name: userid
+        required: true
+        type: string
       produces:
       - application/json
       responses:
@@ -122,6 +108,42 @@ paths:
         "400":
           description: ""
       summary: Get record by user id
+      tags:
+      - Records
+  /api/training/get/all:
+    post:
+      responses:
+        "200":
+          description: ""
+        "400":
+          description: ""
+      tags:
+      - Records
+  /api/training/get/id:
+    post:
+      consumes:
+      - application/json
+      parameters:
+      - default: Bearer <Add access token here>
+        description: Insert your access token
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      - description: only table_name and id (record_id) required
+        in: body
+        name: data
+        required: true
+        schema:
+          $ref: '#/definitions/table.RecordDTO'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: ""
+        "400":
+          description: ""
+      summary: Get record by record id
       tags:
       - Records
   /userapi/heartbeat:

@@ -40,6 +40,8 @@ func (h *Handler) Register(router *httprouter.Router) {
 // @Summary Create record endpoint
 // @Accept json
 // @Produce json
+// @Param Authorization header string true "Insert your access token" default(Bearer <Add access token here>)
+// @Param data body RecordDTO true "create record struct"
 // @Tags Records
 // @Success 201
 // @Failure 400
@@ -73,6 +75,8 @@ func (h *Handler) CreateRecord(w http.ResponseWriter, r *http.Request) error {
 // @Summary Get record by record id
 // @Accept json
 // @Produce json
+// @Param Authorization header string true "Insert your access token" default(Bearer <Add access token here>)
+// @Param data body RecordDTO true "only table_name and id (record_id) required"
 // @Tags Records
 // @Success 200
 // @Failure 400
@@ -108,10 +112,12 @@ func (h *Handler) GetRecordById(w http.ResponseWriter, r *http.Request) error {
 // @Summary Get record by user id
 // @Accept json
 // @Produce json
+// @Param Authorization header string true "Insert your access token" default(Bearer <Add access token here>)
+// @Param userid path string true "User ID"
 // @Tags Records
 // @Success 200
 // @Failure 400
-// @Router /api/training/get/userid [post]
+// @Router /api/training/get/{userid} [post]
 func (h *Handler) GetRecordByUserId(w http.ResponseWriter, r *http.Request) error {
 	h.Logger.Info("GET RECORD BY ID")
 	w.Header().Set("Content-Type", "application/json")
@@ -143,6 +149,8 @@ func (h *Handler) GetRecordByUserId(w http.ResponseWriter, r *http.Request) erro
 // @Summary Get all records of a lobby
 // @Accept json
 // @Produce json
+// @Param Authorization header string true "Insert your access token" default(Bearer <Add access token here>)
+
 // @Tags Records
 // @Success 200
 // @Failure 400
@@ -179,6 +187,8 @@ func (h *Handler) GetRecords(w http.ResponseWriter, r *http.Request) error {
 // @Summary Get collection names of "training-service" db
 // @Accept json
 // @Produce json
+// @Param Authorization header string true "Insert your access token" default(Bearer <Add access token here>)
+
 // @Tags Records
 // @Success 200
 // @Failure 400
@@ -208,6 +218,8 @@ func (h *Handler) GetCollectionNames(w http.ResponseWriter, r *http.Request) err
 // @Summary Partially update record by user id
 // @Accept json
 // @Produce json
+// @Param Authorization header string true "Insert your access token" default(Bearer <Add access token here>)
+
 // @Tags Records
 // @Success 204
 // @Failure 400
@@ -235,6 +247,8 @@ func (h *Handler) PartiallyUpdateRecord(w http.ResponseWriter, r *http.Request) 
 // @Summary Delete record by record id
 // @Accept json
 // @Produce json
+// @Param Authorization header string true "Insert your access token" default(Bearer <Add access token here>)
+
 // @Tags Records
 // @Success 204
 // @Failure 400
@@ -262,6 +276,8 @@ func (h *Handler) DeleteRecord(w http.ResponseWriter, r *http.Request) error {
 // @Summary Create collection endpoint. Needs accept token
 // @Accept json
 // @Produce json
+// @Param Authorization header string true "Insert your access token" default(Bearer <Add access token here>)
+
 // @Tags Collections
 // @Success 201
 // @Failure 400
@@ -288,6 +304,8 @@ func (h *Handler) CreateCollection(w http.ResponseWriter, r *http.Request) error
 // @Summary Delete collection by collection name(table_name). Needs accept token
 // @Accept json
 // @Produce json
+// @Param Authorization header string true "Insert your access token" default(Bearer <Add access token here>)
+
 // @Tags Collections
 // @Success 204
 // @Failure 400
