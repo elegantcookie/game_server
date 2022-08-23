@@ -38,6 +38,7 @@ func (s service) Create(ctx context.Context, dto TicketDTO) (ticketID string, er
 	s.logger.Debug("check password")
 	ticket := Ticket{
 		IsActive:     true,
+		IsGift:       dto.IsGift,
 		TicketPrice:  dto.TicketPrice,
 		PlayerAmount: dto.PlayerAmount,
 		GameType:     dto.GameType,
