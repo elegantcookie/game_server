@@ -6,17 +6,19 @@ import (
 	"fmt"
 	"github.com/julienschmidt/httprouter"
 	"net/http"
-	"training_service/internal/auth"
-	"training_service/pkg/logging"
+	"qualifications_service/internal/auth"
+	"qualifications_service/internal/config"
+	"qualifications_service/pkg/logging"
 )
 
 var (
-	recordsUrl           = "/api/training"
-	getAllRecordsUrl     = "/api/training/get/all/"
-	getRecordUrl         = "/api/training/get/id/"
-	getRecordByUserIDUrl = "/api/training/get/userid"
-	getAllCollectionsUrl = "/api/training/collections/get/all"
-	collectionsUrl       = "/api/training/collections"
+	recordsUrl           = "/api/qualifications"
+	getAllRecordsUrl     = "/api/qualifications/get/all/"
+	getRecordUrl         = "/api/qualifications/get/id/"
+	getRecordByUserIDUrl = "/api/qualifications/get/userid"
+	getAllCollectionsUrl = "/api/qualifications/collections/get/all"
+	collectionsUrl       = "/api/qualifications/collections"
+	updateTableURL       = "/api/qualifications/time/:game_type"
 )
 
 type Handler struct {
@@ -34,14 +36,13 @@ func (h *Handler) Register(router *httprouter.Router) {
 	router.HandlerFunc(http.MethodPatch, recordsUrl, auth.Middleware(h.PartiallyUpdateRecord))
 	router.HandlerFunc(http.MethodPost, collectionsUrl, auth.Middleware(h.CreateCollection))
 	router.HandlerFunc(http.MethodDelete, collectionsUrl, auth.Middleware(h.DeleteCollectionByName))
+	router.Handler(http.MethodPut, updateTableURL, auth.NoAuthMiddleware(h.UpdateTable))
 }
 
 // Create record
 // @Summary Create record endpoint
 // @Accept json
 // @Produce json
-// @Param Authorization header string true "Insert your access token" default(Bearer <Add access token here>)
-// @Param data body RecordDTO true "create record struct"
 // @Tags Records
 // @Success 201
 // @Failure 400
@@ -75,8 +76,6 @@ func (h *Handler) CreateRecord(w http.ResponseWriter, r *http.Request) error {
 // @Summary Get record by record id
 // @Accept json
 // @Produce json
-// @Param Authorization header string true "Insert your access token" default(Bearer <Add access token here>)
-// @Param data body RecordDTO true "only table_name and id (record_id) required"
 // @Tags Records
 // @Success 200
 // @Failure 400
@@ -112,12 +111,10 @@ func (h *Handler) GetRecordById(w http.ResponseWriter, r *http.Request) error {
 // @Summary Get record by user id
 // @Accept json
 // @Produce json
-// @Param Authorization header string true "Insert your access token" default(Bearer <Add access token here>)
-// @Param userid path string true "User ID"
 // @Tags Records
 // @Success 200
 // @Failure 400
-// @Router /api/training/get/{userid} [post]
+// @Router /api/training/get/userid [post]
 func (h *Handler) GetRecordByUserId(w http.ResponseWriter, r *http.Request) error {
 	h.Logger.Info("GET RECORD BY ID")
 	w.Header().Set("Content-Type", "application/json")
@@ -149,8 +146,6 @@ func (h *Handler) GetRecordByUserId(w http.ResponseWriter, r *http.Request) erro
 // @Summary Get all records of a lobby
 // @Accept json
 // @Produce json
-// @Param Authorization header string true "Insert your access token" default(Bearer <Add access token here>)
-
 // @Tags Records
 // @Success 200
 // @Failure 400
@@ -187,8 +182,6 @@ func (h *Handler) GetRecords(w http.ResponseWriter, r *http.Request) error {
 // @Summary Get collection names of "training-service" db
 // @Accept json
 // @Produce json
-// @Param Authorization header string true "Insert your access token" default(Bearer <Add access token here>)
-
 // @Tags Records
 // @Success 200
 // @Failure 400
@@ -218,8 +211,6 @@ func (h *Handler) GetCollectionNames(w http.ResponseWriter, r *http.Request) err
 // @Summary Partially update record by user id
 // @Accept json
 // @Produce json
-// @Param Authorization header string true "Insert your access token" default(Bearer <Add access token here>)
-
 // @Tags Records
 // @Success 204
 // @Failure 400
@@ -247,8 +238,6 @@ func (h *Handler) PartiallyUpdateRecord(w http.ResponseWriter, r *http.Request) 
 // @Summary Delete record by record id
 // @Accept json
 // @Produce json
-// @Param Authorization header string true "Insert your access token" default(Bearer <Add access token here>)
-
 // @Tags Records
 // @Success 204
 // @Failure 400
@@ -276,8 +265,6 @@ func (h *Handler) DeleteRecord(w http.ResponseWriter, r *http.Request) error {
 // @Summary Create collection endpoint. Needs accept token
 // @Accept json
 // @Produce json
-// @Param Authorization header string true "Insert your access token" default(Bearer <Add access token here>)
-
 // @Tags Collections
 // @Success 201
 // @Failure 400
@@ -287,6 +274,7 @@ func (h *Handler) CreateCollection(w http.ResponseWriter, r *http.Request) error
 	w.Header().Set("Content-Type", "application/json")
 
 	var dto CollectionDTO
+	dto.JWTToken = r.Header.Get("Authorization")
 	defer r.Body.Close()
 	err := json.NewDecoder(r.Body).Decode(&dto)
 	if err != nil {
@@ -304,8 +292,6 @@ func (h *Handler) CreateCollection(w http.ResponseWriter, r *http.Request) error
 // @Summary Delete collection by collection name(table_name). Needs accept token
 // @Accept json
 // @Produce json
-// @Param Authorization header string true "Insert your access token" default(Bearer <Add access token here>)
-
 // @Tags Collections
 // @Success 204
 // @Failure 400
@@ -326,5 +312,27 @@ func (h *Handler) DeleteCollectionByName(w http.ResponseWriter, r *http.Request)
 	}
 	w.WriteHeader(http.StatusNoContent)
 
+	return nil
+}
+
+func (h *Handler) UpdateTable(w http.ResponseWriter, r *http.Request) error {
+	gameType := httprouter.ParamsFromContext(r.Context()).ByName("game_type")
+	h.Logger.Infof("UPDATE TABLE: %s", gameType)
+	dto := CollectionDTO{
+		AccessKey: config.GetConfig().Keys.AccessKey,
+		Name:      gameType,
+		JWTToken:  r.Header.Get("Authorization"),
+	}
+	expiration, err := h.TrainingService.UpdateTable(r.Context(), dto)
+	if err != nil {
+		return err
+	}
+	tmp := map[string]int64{"expiration": expiration}
+	bytes, err := json.Marshal(&tmp)
+	if err != nil {
+		return err
+	}
+	w.Write(bytes)
+	h.Logger.Println(string(bytes))
 	return nil
 }

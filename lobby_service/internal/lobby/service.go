@@ -44,13 +44,14 @@ type Service interface {
 
 func NotifyManager(ctx context.Context, jwtToken, lobbyID string, startTime int64) error {
 	log.Printf("JWT TOKEN: %v", jwtToken)
-	u := "http://localhost:10007/api/manager/"
+	u := notifyMangerURL
 
 	body := io.NopCloser(strings.NewReader(fmt.Sprintf(`
 {
+	"type": %s,
 	"lobby_id": "%s",
 	"expiration": %d
-}`, lobbyID, startTime)))
+}`, typeLobby, lobbyID, startTime)))
 	request, err := http.NewRequestWithContext(ctx, http.MethodPost, u, body)
 	log.Println(jwtToken)
 	request.Header.Add("Authorization", jwtToken)

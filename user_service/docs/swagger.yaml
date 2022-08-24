@@ -1,3 +1,53 @@
+definitions:
+  apperror.AppError:
+    properties:
+      code:
+        type: string
+      developer_message:
+        type: string
+      message:
+        type: string
+    type: object
+  user.CreateUserDTO:
+    properties:
+      password:
+        type: string
+      username:
+        type: string
+    type: object
+  user.GameTickets:
+    properties:
+      amount:
+        type: integer
+      game_type:
+        type: string
+      tickets_of_gt:
+        items:
+          type: string
+        type: array
+    type: object
+  user.TicketDTO:
+    properties:
+      game_type:
+        type: string
+      id:
+        type: string
+      ticket_id:
+        type: string
+    type: object
+  user.UpdateUserDTO:
+    properties:
+      has_free_ticket:
+        type: boolean
+      id:
+        type: string
+      tickets:
+        items:
+          $ref: '#/definitions/user.GameTickets'
+        type: array
+      username:
+        type: string
+    type: object
 info:
   contact: {}
 paths:
@@ -5,6 +55,12 @@ paths:
     delete:
       consumes:
       - application/json
+      parameters:
+      - description: User ID
+        in: path
+        name: asd
+        required: true
+        type: string
       produces:
       - application/json
       responses:
@@ -12,6 +68,10 @@ paths:
           description: ""
         "400":
           description: ""
+        "418":
+          description: I'm a teapot
+          schema:
+            $ref: '#/definitions/apperror.AppError'
       summary: Delete user by id endpoint
       tags:
       - Users
@@ -31,6 +91,13 @@ paths:
     patch:
       consumes:
       - application/json
+      parameters:
+      - description: update user struct
+        in: body
+        name: data
+        required: true
+        schema:
+          $ref: '#/definitions/user.UpdateUserDTO'
       produces:
       - application/json
       responses:
@@ -38,12 +105,23 @@ paths:
           description: ""
         "400":
           description: ""
+        "418":
+          description: I'm a teapot
+          schema:
+            $ref: '#/definitions/apperror.AppError'
       summary: Partially update user endpoint
       tags:
       - Users
     post:
       consumes:
       - application/json
+      parameters:
+      - description: create user struct
+        in: body
+        name: data
+        required: true
+        schema:
+          $ref: '#/definitions/user.CreateUserDTO'
       produces:
       - application/json
       responses:
@@ -51,6 +129,10 @@ paths:
           description: ""
         "400":
           description: ""
+        "418":
+          description: I'm a teapot
+          schema:
+            $ref: '#/definitions/apperror.AppError'
       summary: Create user endpoint
       tags:
       - Users
@@ -58,6 +140,13 @@ paths:
     post:
       consumes:
       - application/json
+      parameters:
+      - description: create user struct
+        in: body
+        name: data
+        required: true
+        schema:
+          $ref: '#/definitions/user.CreateUserDTO'
       produces:
       - application/json
       responses:
@@ -65,13 +154,23 @@ paths:
           description: ""
         "400":
           description: ""
+        "418":
+          description: I'm a teapot
+          schema:
+            $ref: '#/definitions/apperror.AppError'
       summary: Get user by username and password. Needs for authorization
       tags:
       - Users
-  /api/users/id/:id:
+  /api/users/id/{id}:
     post:
       consumes:
       - application/json
+      parameters:
+      - description: User ID
+        in: path
+        name: user_id
+        required: true
+        type: string
       produces:
       - application/json
       responses:
@@ -79,6 +178,10 @@ paths:
           description: ""
         "400":
           description: ""
+        "418":
+          description: I'm a teapot
+          schema:
+            $ref: '#/definitions/apperror.AppError'
       summary: Get user by user id
       tags:
       - Users
@@ -86,6 +189,12 @@ paths:
     delete:
       consumes:
       - application/json
+      parameters:
+      - description: User ID
+        in: path
+        name: data
+        required: true
+        type: string
       produces:
       - application/json
       responses:
@@ -93,12 +202,23 @@ paths:
           description: ""
         "400":
           description: ""
-      summary: Delete lobby by user id and lobby id
+        "418":
+          description: I'm a teapot
+          schema:
+            $ref: '#/definitions/apperror.AppError'
+      summary: Delete user by user id and user id
       tags:
       - Tickets
     put:
       consumes:
       - application/json
+      parameters:
+      - description: ticket dto struct
+        in: body
+        name: data
+        required: true
+        schema:
+          $ref: '#/definitions/user.TicketDTO'
       produces:
       - application/json
       responses:
@@ -106,13 +226,47 @@ paths:
           description: ""
         "400":
           description: ""
-      summary: Add lobby by user id and lobby id
+        "418":
+          description: I'm a teapot
+          schema:
+            $ref: '#/definitions/apperror.AppError'
+      summary: Add user by user id and user id
       tags:
       - Tickets
-  /api/users/tickets/free/:id:
+  /api/users/tickets/free/{id}:
     post:
       consumes:
       - application/json
+      parameters:
+      - description: Ticket ID
+        in: path
+        name: ticket_id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: ""
+        "404":
+          description: ""
+        "418":
+          description: I'm a teapot
+          schema:
+            $ref: '#/definitions/apperror.AppError'
+      summary: Get user status
+      tags:
+      - Tickets
+  /api/users/username/{username}:
+    post:
+      consumes:
+      - application/json
+      parameters:
+      - description: Username
+        in: path
+        name: username
+        required: true
+        type: string
       produces:
       - application/json
       responses:
@@ -120,20 +274,10 @@ paths:
           description: ""
         "400":
           description: ""
-      summary: Get lobby status
-      tags:
-      - Tickets
-  /api/users/username/:username:
-    post:
-      consumes:
-      - application/json
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: ""
-        "400":
-          description: ""
+        "418":
+          description: I'm a teapot
+          schema:
+            $ref: '#/definitions/apperror.AppError'
       summary: Get user by username endpoint
       tags:
       - Users

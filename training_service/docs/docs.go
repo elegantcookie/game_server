@@ -28,6 +28,25 @@ const docTemplate = `{
                     "Records"
                 ],
                 "summary": "Create record endpoint",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "default": "Bearer \u003cAdd access token here\u003e",
+                        "description": "Insert your access token",
+                        "name": "Authorization",
+                        "in": "header",
+                        "required": true
+                    },
+                    {
+                        "description": "create record struct",
+                        "name": "data",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/table.RecordDTO"
+                        }
+                    }
+                ],
                 "responses": {
                     "201": {
                         "description": ""
@@ -38,16 +57,9 @@ const docTemplate = `{
                 }
             },
             "delete": {
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
                 "tags": [
                     "Records"
                 ],
-                "summary": "Delete record by record id",
                 "responses": {
                     "204": {
                         "description": ""
@@ -58,16 +70,9 @@ const docTemplate = `{
                 }
             },
             "patch": {
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
                 "tags": [
                     "Records"
                 ],
-                "summary": "Partially update record by user id",
                 "responses": {
                     "204": {
                         "description": ""
@@ -80,16 +85,9 @@ const docTemplate = `{
         },
         "/api/training/collections": {
             "post": {
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
                 "tags": [
                     "Collections"
                 ],
-                "summary": "Create collection endpoint. Needs accept token",
                 "responses": {
                     "201": {
                         "description": ""
@@ -100,16 +98,9 @@ const docTemplate = `{
                 }
             },
             "delete": {
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
                 "tags": [
                     "Collections"
                 ],
-                "summary": "Delete collection by collection name(table_name). Needs accept token",
                 "responses": {
                     "204": {
                         "description": ""
@@ -122,16 +113,9 @@ const docTemplate = `{
         },
         "/api/training/collections/get/all": {
             "get": {
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
                 "tags": [
                     "Records"
                 ],
-                "summary": "Get collection names of \"training-service\" db",
                 "responses": {
                     "200": {
                         "description": ""
@@ -144,16 +128,9 @@ const docTemplate = `{
         },
         "/api/training/get/all": {
             "post": {
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
                 "tags": [
                     "Records"
                 ],
-                "summary": "Get all records of a lobby",
                 "responses": {
                     "200": {
                         "description": ""
@@ -176,6 +153,25 @@ const docTemplate = `{
                     "Records"
                 ],
                 "summary": "Get record by record id",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "default": "Bearer \u003cAdd access token here\u003e",
+                        "description": "Insert your access token",
+                        "name": "Authorization",
+                        "in": "header",
+                        "required": true
+                    },
+                    {
+                        "description": "only table_name and id (record_id) required",
+                        "name": "data",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/table.RecordDTO"
+                        }
+                    }
+                ],
                 "responses": {
                     "200": {
                         "description": ""
@@ -186,7 +182,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/api/training/get/userid": {
+        "/api/training/get/{userid}": {
             "post": {
                 "consumes": [
                     "application/json"
@@ -198,6 +194,23 @@ const docTemplate = `{
                     "Records"
                 ],
                 "summary": "Get record by user id",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "default": "Bearer \u003cAdd access token here\u003e",
+                        "description": "Insert your access token",
+                        "name": "Authorization",
+                        "in": "header",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "User ID",
+                        "name": "userid",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
                 "responses": {
                     "200": {
                         "description": ""
@@ -221,6 +234,28 @@ const docTemplate = `{
                     "400": {
                         "description": ""
                     }
+                }
+            }
+        }
+    },
+    "definitions": {
+        "table.RecordDTO": {
+            "type": "object",
+            "properties": {
+                "id": {
+                    "type": "string"
+                },
+                "table_name": {
+                    "type": "string"
+                },
+                "user_id": {
+                    "type": "string"
+                },
+                "user_score": {
+                    "type": "string"
+                },
+                "username": {
+                    "type": "string"
                 }
             }
         }

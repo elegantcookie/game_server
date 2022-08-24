@@ -18,7 +18,9 @@ type db struct {
 
 func (d *db) Create(ctx context.Context, dto manager.LobbyRecordDTO) (string, error) {
 	lr := manager.LobbyRecord{
+		Type:       dto.Type,
 		LobbyID:    dto.LobbyID,
+		GameType:   dto.GameType,
 		Expiration: dto.Expiration,
 	}
 	result, err := d.collection.InsertOne(ctx, lr)

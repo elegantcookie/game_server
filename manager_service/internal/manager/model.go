@@ -9,7 +9,9 @@ import (
 
 type LobbyRecord struct {
 	ID         string `json:"id" bson:"_id,omitempty"`
+	Type       string `json:"type" bson:"type"`
 	LobbyID    string `json:"lobby_id" bson:"lobby_id"`
+	GameType   string `json:"game_type" bson:"game_type"`
 	Expiration int64  `json:"expiration,string" bson:"expiration"`
 }
 
@@ -18,7 +20,9 @@ func (lr LobbyRecord) Expired() bool {
 }
 
 type LobbyRecordDTO struct {
+	Type       string `json:"type"`
 	LobbyID    string `json:"lobby_id"`
+	GameType   string `json:"game_type"`
 	Expiration int64  `json:"expiration"`
 	JWTToken   string `json:"-"`
 }
@@ -57,13 +61,15 @@ func (fq *FuncArray) Update(lr LobbyRecord) error {
 	return nil
 }
 
-//
-//func (fq *FuncArray) Pop() *Node {
-//	if fq.Head == nil {
-//		return nil
-//	}
-//	head := fq.Head
-//	fq.Head = fq.Head.Next
-//	fq.Length -= 1
-//	return head
-//}
+type LRResponse struct {
+	UpdatedTime int64
+	StatusCode  int
+	Delete      bool
+}
+
+func (r LRResponse) CorrectResponse() bool {
+	if r.StatusCode > 299 || r.StatusCode == 0 {
+		return false
+	}
+	return true
+}
