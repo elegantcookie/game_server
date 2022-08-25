@@ -68,6 +68,13 @@ type JoinLobbyDTO struct {
 	JWTToken string `json:"-"`
 }
 
+type NotifyManagerDTO struct {
+	GameType   string `json:"game_type"`
+	LobbyID    string `json:"lobby_id"`
+	Expiration int64  `json:"expiration"`
+	JWTToken   string `json:"jwt_token"`
+}
+
 type Params struct {
 	GameType   string `json:"game_type"`
 	PrizeSum   int    `json:"prize_sum"`

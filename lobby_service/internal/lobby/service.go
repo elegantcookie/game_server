@@ -42,19 +42,17 @@ type Service interface {
 	UpdateLobbyTime(ctx context.Context, utdto UpdateTimeDTO) (int64, error)
 }
 
-func NotifyManager(ctx context.Context, jwtToken, lobbyID string, startTime int64) error {
-	log.Printf("JWT TOKEN: %v", jwtToken)
+func NotifyManager(ctx context.Context, dto NotifyManagerDTO) error {
 	u := notifyMangerURL
 
-	body := io.NopCloser(strings.NewReader(fmt.Sprintf(`
-{
-	"type": %s,
-	"lobby_id": "%s",
-	"expiration": %d
-}`, typeLobby, lobbyID, startTime)))
+	bytes, err := json.Marshal(dto)
+	if err != nil {
+		log.Printf("failed to marshal data(%v) due to: %v", dto, err)
+		return fmt.Errorf("failed to marshal data due to: %v", err)
+	}
+	body := io.NopCloser(strings.NewReader(fmt.Sprintf(string(bytes))))
 	request, err := http.NewRequestWithContext(ctx, http.MethodPost, u, body)
-	log.Println(jwtToken)
-	request.Header.Add("Authorization", jwtToken)
+	request.Header.Add("Authorization", dto.JWTToken)
 	var client http.Client
 	response, err := client.Do(request)
 	if err != nil {
@@ -67,7 +65,11 @@ func NotifyManager(ctx context.Context, jwtToken, lobbyID string, startTime int6
 	}
 	if response.StatusCode != 200 {
 		log.Printf("got wrong status code: %d", response.StatusCode)
-
+		bytes, err := io.ReadAll(response.Body)
+		if err != nil {
+			return err
+		}
+		log.Printf("response body: %s", string(bytes))
 		return fmt.Errorf("got wrong status code: %d", response.StatusCode)
 	}
 	return nil
@@ -112,7 +114,13 @@ func (s service) Create(ctx context.Context, dto LobbyDTO) (lobbyID string, err 
 		return lobbyID, fmt.Errorf("failed to create lobby. error: %w", err)
 	}
 
-	err = NotifyManager(ctx, dto.JWTToken, lobbyID, lobby.StartTime)
+	notifyDTO := NotifyManagerDTO{
+		GameType:   lobby.GameType,
+		LobbyID:    lobbyID,
+		Expiration: lobby.StartTime,
+		JWTToken:   dto.JWTToken,
+	}
+	err = NotifyManager(ctx, notifyDTO)
 	if err != nil {
 		return "", fmt.Errorf("failed to notify manager due to: %v", err)
 	}

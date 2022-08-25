@@ -12,11 +12,11 @@ import (
 )
 
 var (
-	gameServersUrl  = "/api/quiz/"
-	getAllSnakesUrl = "/api/quiz/all/"
-	gameServerIDUrl = "/api/quiz/id/:id"
-	sendResultURL   = "/api/quiz/res/"
-	getStatusURL    = "/api/quiz/status/:id"
+	gameServersUrl  = "/api/snake/"
+	getAllSnakesUrl = "/api/snake/all/"
+	gameServerIDUrl = "/api/snake/id/:id"
+	sendResultURL   = "/api/snake/res/"
+	getStatusURL    = "/api/snake/status/:id"
 )
 
 type Handler struct {
