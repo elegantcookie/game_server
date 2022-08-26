@@ -56,3 +56,10 @@ type NotifyManagerDTO struct {
 	GameType   string `json:"game_type"`
 	Expiration int64  `json:"expiration"`
 }
+
+func ReverseArray(array []Record) {
+	usersLen := len(array)
+	for i := 0; i < usersLen/2; i++ {
+		array[i], array[usersLen-1-i] = array[usersLen-1-i], array[i]
+	}
+}

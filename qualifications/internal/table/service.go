@@ -94,7 +94,7 @@ func NotifyManager(ctx context.Context, jwtToken, gameType string, startTime int
 }
 
 func (s service) Create(ctx context.Context, dto RecordDTO) (recordID string, err error) {
-	s.logger.Debug("check password")
+
 	recordID, err = s.storage.Create(ctx, dto)
 	if err != nil {
 		if errors.Is(err, auth.ErrNotFound) {
@@ -135,6 +135,9 @@ func (s service) GetAll(ctx context.Context, dto RecordDTO) ([]Record, error) {
 	users, err := s.storage.FindAll(ctx, dto)
 	if err != nil {
 		return users, fmt.Errorf("failed to find records. error: %v", err)
+	}
+	if dto.TableName == "checkers" {
+		ReverseArray(users)
 	}
 	return users, nil
 }
