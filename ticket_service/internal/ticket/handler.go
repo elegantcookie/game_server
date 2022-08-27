@@ -55,6 +55,7 @@ func (h *Handler) CreateTicket(w http.ResponseWriter, r *http.Request) error {
 	if err != nil {
 		return auth.BadRequestError("invalid JSON scheme. check swagger API")
 	}
+	dto.JWTToken = r.Header.Get("Authorization")
 	ticketID, err := h.TicketService.Create(context.Background(), dto)
 	if err != nil {
 		return err
