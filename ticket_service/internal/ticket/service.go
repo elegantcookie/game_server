@@ -2,8 +2,12 @@ package ticket
 
 import (
 	"context"
+	"encoding/json"
 	"errors"
 	"fmt"
+	"io"
+	"net/http"
+	"strings"
 	"ticket_service/internal/auth"
 	"ticket_service/internal/config"
 	"ticket_service/pkg/logging"
@@ -37,6 +41,7 @@ type Service interface {
 func (s service) Create(ctx context.Context, dto TicketDTO) (ticketID string, err error) {
 	s.logger.Debug("check password")
 	ticket := Ticket{
+		UserID:       dto.UserID,
 		IsActive:     true,
 		IsGift:       dto.IsGift,
 		TicketPrice:  dto.TicketPrice,
@@ -50,6 +55,36 @@ func (s service) Create(ctx context.Context, dto TicketDTO) (ticketID string, er
 			return ticketID, err
 		}
 		return ticketID, fmt.Errorf("failed to create lobby. error: %w", err)
+	}
+
+	var client http.Client
+	addTicketDTO := NewAddTicketDTO(ticketID, &dto)
+	bytes, err := json.Marshal(addTicketDTO)
+	if err != nil {
+		return "", fmt.Errorf("failed to marshal data due to: %v", err)
+	}
+	reqBody := io.NopCloser(strings.NewReader(string(bytes)))
+	request, err := http.NewRequestWithContext(ctx, http.MethodPut, AddTicketByIDURL, reqBody)
+	if err != nil {
+		return "", fmt.Errorf("failed to make request due to: %v", err)
+	}
+	request.Header.Set("Authorization", dto.JWTToken)
+	response, err := client.Do(request)
+	if err != nil {
+		return "", fmt.Errorf("failed to do request due to: %v", err)
+	}
+	if response == nil {
+		return "", fmt.Errorf("response is nil")
+	}
+	if response.StatusCode != 201 {
+		if response.StatusCode == 418 {
+			bytes, err = io.ReadAll(response.Body)
+			if err != nil {
+				return "", fmt.Errorf("faileed to read response body due to: %v", err)
+			}
+			return "", fmt.Errorf("wrong status code: %d. Response text: %s", response.StatusCode, string(bytes))
+		}
+		return "", fmt.Errorf("wrong status code: %d", response.StatusCode)
 	}
 
 	return ticketID, nil
