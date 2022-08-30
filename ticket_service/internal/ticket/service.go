@@ -6,6 +6,7 @@ import (
 	"errors"
 	"fmt"
 	"io"
+	"log"
 	"net/http"
 	"strings"
 	"ticket_service/internal/auth"
@@ -39,7 +40,6 @@ type Service interface {
 }
 
 func (s service) Create(ctx context.Context, dto TicketDTO) (ticketID string, err error) {
-	s.logger.Debug("check password")
 	ticket := Ticket{
 		UserID:       dto.UserID,
 		IsActive:     true,
@@ -54,7 +54,7 @@ func (s service) Create(ctx context.Context, dto TicketDTO) (ticketID string, er
 		if errors.Is(err, auth.ErrNotFound) {
 			return ticketID, err
 		}
-		return ticketID, fmt.Errorf("failed to create lobby. error: %w", err)
+		return ticketID, fmt.Errorf("failed to create ticket. error: %w", err)
 	}
 
 	var client http.Client
@@ -63,6 +63,7 @@ func (s service) Create(ctx context.Context, dto TicketDTO) (ticketID string, er
 	if err != nil {
 		return "", fmt.Errorf("failed to marshal data due to: %v", err)
 	}
+	log.Println("ASDASDASD")
 	reqBody := io.NopCloser(strings.NewReader(string(bytes)))
 	request, err := http.NewRequestWithContext(ctx, http.MethodPut, AddTicketByIDURL, reqBody)
 	if err != nil {
@@ -84,6 +85,7 @@ func (s service) Create(ctx context.Context, dto TicketDTO) (ticketID string, er
 			}
 			return "", fmt.Errorf("wrong status code: %d. Response text: %s", response.StatusCode, string(bytes))
 		}
+		log.Println(response.StatusCode)
 		return "", fmt.Errorf("wrong status code: %d", response.StatusCode)
 	}
 

@@ -1,7 +1,6 @@
 package ticket
 
 import (
-	"context"
 	"encoding/json"
 	"fmt"
 	"github.com/julienschmidt/httprouter"
@@ -56,7 +55,7 @@ func (h *Handler) CreateTicket(w http.ResponseWriter, r *http.Request) error {
 		return auth.BadRequestError("invalid JSON scheme. check swagger API")
 	}
 	dto.JWTToken = r.Header.Get("Authorization")
-	ticketID, err := h.TicketService.Create(context.Background(), dto)
+	ticketID, err := h.TicketService.Create(r.Context(), dto)
 	if err != nil {
 		return err
 	}

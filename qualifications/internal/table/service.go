@@ -193,6 +193,7 @@ func (s service) DeleteCollection(ctx context.Context, dto CollectionDTO) error 
 func (s service) CreateTicket(ctx context.Context, dto CreateTicketDTO) (string, error) {
 	url := createTicketURL
 	payload := fmt.Sprintf(`{
+	"user_id": "asd",
 	"ticket_price": %d,
 	"player_amount": %d,
 	"game_type": %s,
@@ -213,7 +214,7 @@ func (s service) CreateTicket(ctx context.Context, dto CreateTicketDTO) (string,
 		return "", fmt.Errorf("response is nil")
 	}
 	if response.StatusCode != http.StatusCreated {
-		return "", fmt.Errorf("wrong status code: %v", err)
+		return "", fmt.Errorf("wrong status code: %d", response.StatusCode)
 	}
 
 	var responseDTO TicketDTO
@@ -225,63 +226,9 @@ func (s service) CreateTicket(ctx context.Context, dto CreateTicketDTO) (string,
 	return responseDTO.TicketID, nil
 }
 
-func (s service) AddTicketToUser(ctx context.Context, dto AddTicketToUserDTO) error {
-	bytes, err := json.Marshal(&dto)
-	if err != nil {
-		return fmt.Errorf("failed to marshal data due to: %v", err)
-	}
-	body := io.NopCloser(strings.NewReader(string(bytes)))
-
-	request, err := http.NewRequestWithContext(ctx, http.MethodPut, addTicketToUserURL, body)
-	if err != nil {
-		return fmt.Errorf("failed to make request due to: %v", err)
-	}
-	request.Header.Add("Authorization", dto.JWTToken)
-	var client http.Client
-	response, err := client.Do(request)
-	if err != nil {
-		return fmt.Errorf("failed to do request due to: %v", err)
-	}
-	if response == nil {
-		return fmt.Errorf("response is nil")
-	}
-	if response.StatusCode != http.StatusNoContent {
-		return fmt.Errorf("wrong status code: %v", err)
-	}
-
-	return nil
-}
-
 func (s service) AddTicketToWinner(ctx context.Context, dto RecordDTO) error {
-	records, err := s.GetAll(ctx, dto)
-	if err != nil {
-		return err
-	}
-	if len(records) == 0 {
-		log.Println("TABLE IS EMPTY")
-		return nil
-	}
-	dto.UserID = records[0].UserID
-
-	createTicketDTO := CreateTicketDTO{
-		GameType: dto.TableName,
-		JWT:      dto.JWTToken,
-	}
-	ticketID, err := s.CreateTicket(ctx, createTicketDTO)
-	if err != nil {
-		return fmt.Errorf("failed to create ticket due to: %v", err)
-	}
-
-	rdto := AddTicketToUserDTO{
-		ID:       dto.UserID,
-		TicketID: ticketID,
-		GameType: dto.TableName,
-		JWTToken: dto.JWTToken,
-	}
-	err = s.AddTicketToUser(ctx, rdto)
-	if err != nil {
-		return fmt.Errorf("failed to add ticket to user due to: %v", err)
-	}
+	// TODO implement create ticket with user_id
+	s.logger.Println("ADD TICKET TO WINNER NOT IMPLEMENTED!!!")
 	return nil
 }
 
