@@ -35,8 +35,27 @@ type CollectionDTO struct {
 }
 
 type CreateTicketDTO struct {
+	UserID   string `json:"user_id"`
 	GameType string `json:"game_type"`
 	JWT      string `json:"-"`
+}
+
+// CTicketDTO includes fields to create ticket with changed signature
+type CTicketDTO struct {
+	UserID       string `json:"user_id"`
+	IsGift       bool   `json:"is_gift"`
+	TicketPrice  int    `json:"ticket_price"`
+	PlayerAmount int    `json:"player_amount"`
+	GameType     string `json:"game_type"`
+	PrizeId      string `json:"prize_id"`
+}
+
+func NewCreateTicketDTO(gameType string, dto RecordDTO) CreateTicketDTO {
+	return CreateTicketDTO{
+		UserID:   dto.UserID,
+		GameType: gameType,
+		JWT:      dto.JWTToken,
+	}
 }
 
 type AddTicketToUserDTO struct {

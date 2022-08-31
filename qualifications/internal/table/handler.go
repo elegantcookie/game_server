@@ -22,8 +22,8 @@ var (
 )
 
 type Handler struct {
-	Logger          logging.Logger
-	TrainingService Service
+	Logger               logging.Logger
+	QualificationService Service
 }
 
 func (h *Handler) Register(router *httprouter.Router) {
@@ -57,7 +57,7 @@ func (h *Handler) CreateRecord(w http.ResponseWriter, r *http.Request) error {
 	if err != nil {
 		return auth.BadRequestError("invalid JSON scheme. check swagger API")
 	}
-	recordId, err := h.TrainingService.Create(context.Background(), dto)
+	recordId, err := h.QualificationService.Create(context.Background(), dto)
 	if err != nil {
 		return err
 	}
@@ -91,7 +91,7 @@ func (h *Handler) GetRecordById(w http.ResponseWriter, r *http.Request) error {
 		return auth.BadRequestError("invalid JSON scheme. check swagger API")
 	}
 
-	user, err := h.TrainingService.GetById(r.Context(), dto)
+	user, err := h.QualificationService.GetById(r.Context(), dto)
 	if err != nil {
 		return err
 	}
@@ -126,7 +126,7 @@ func (h *Handler) GetRecordByUserId(w http.ResponseWriter, r *http.Request) erro
 		return auth.BadRequestError("invalid JSON scheme. check swagger API")
 	}
 
-	user, err := h.TrainingService.GetByUserId(r.Context(), dto)
+	user, err := h.QualificationService.GetByUserId(r.Context(), dto)
 	if err != nil {
 		return err
 	}
@@ -161,7 +161,7 @@ func (h *Handler) GetRecords(w http.ResponseWriter, r *http.Request) error {
 		return auth.BadRequestError("invalid JSON scheme. check swagger API")
 	}
 
-	users, err := h.TrainingService.GetAll(r.Context(), dto)
+	users, err := h.QualificationService.GetAll(r.Context(), dto)
 	if err != nil {
 		return err
 	}
@@ -190,7 +190,7 @@ func (h *Handler) GetCollectionNames(w http.ResponseWriter, r *http.Request) err
 	h.Logger.Info("GET RECORDS")
 	w.Header().Set("Content-Type", "application/json")
 
-	collectionNames, err := h.TrainingService.GetCollectionNames(context.Background())
+	collectionNames, err := h.QualificationService.GetCollectionNames(context.Background())
 	if err != nil {
 		return err
 	}
@@ -225,7 +225,7 @@ func (h *Handler) PartiallyUpdateRecord(w http.ResponseWriter, r *http.Request) 
 		return auth.BadRequestError("invalid JSON scheme. check swagger API")
 	}
 
-	err := h.TrainingService.Update(r.Context(), dto)
+	err := h.QualificationService.Update(r.Context(), dto)
 	if err != nil {
 		return err
 	}
@@ -252,7 +252,7 @@ func (h *Handler) DeleteRecord(w http.ResponseWriter, r *http.Request) error {
 		return fmt.Errorf("unable to decode response body due to: %v", err)
 	}
 
-	err = h.TrainingService.Delete(r.Context(), dto)
+	err = h.QualificationService.Delete(r.Context(), dto)
 	if err != nil {
 		return err
 	}
@@ -280,7 +280,7 @@ func (h *Handler) CreateCollection(w http.ResponseWriter, r *http.Request) error
 	if err != nil {
 		return auth.BadRequestError("invalid JSON scheme. check swagger API")
 	}
-	err = h.TrainingService.CreateCollection(context.Background(), dto)
+	err = h.QualificationService.CreateCollection(context.Background(), dto)
 	if err != nil {
 		return err
 	}
@@ -306,7 +306,7 @@ func (h *Handler) DeleteCollectionByName(w http.ResponseWriter, r *http.Request)
 		return auth.BadRequestError("invalid JSON scheme. check swagger API")
 	}
 
-	err = h.TrainingService.DeleteCollection(r.Context(), dto)
+	err = h.QualificationService.DeleteCollection(r.Context(), dto)
 	if err != nil {
 		return err
 	}
@@ -323,7 +323,7 @@ func (h *Handler) UpdateTable(w http.ResponseWriter, r *http.Request) error {
 		Name:      gameType,
 		JWTToken:  r.Header.Get("Authorization"),
 	}
-	expiration, err := h.TrainingService.UpdateTable(r.Context(), dto)
+	expiration, err := h.QualificationService.UpdateTable(r.Context(), dto)
 	if err != nil {
 		return err
 	}

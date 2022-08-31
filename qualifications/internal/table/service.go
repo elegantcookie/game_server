@@ -48,15 +48,14 @@ func (s service) CreateCollection(ctx context.Context, dto CollectionDTO) error 
 	if err != nil {
 		return fmt.Errorf("failed to create record. error: %w", err)
 	}
-	err = NotifyManager(ctx, dto.JWTToken, dto.Name, time.Now().Add(timeDelta).Unix())
+	err = NotifyManager(ctx, dto.Name, time.Now().Add(timeDelta).Unix())
 	if err != nil {
 		return fmt.Errorf("failed to notify manager due to: %v", err)
 	}
 	return nil
 }
 
-func NotifyManager(ctx context.Context, jwtToken, gameType string, startTime int64) error {
-	log.Printf("JWT TOKEN: %v", jwtToken)
+func NotifyManager(ctx context.Context, gameType string, startTime int64) error {
 	u := notifyMangerURL
 	dto := NotifyManagerDTO{
 		Type:       typeQualifications,
@@ -69,8 +68,6 @@ func NotifyManager(ctx context.Context, jwtToken, gameType string, startTime int
 	}
 	body := io.NopCloser(strings.NewReader(string(bytes)))
 	request, err := http.NewRequestWithContext(ctx, http.MethodPost, u, body)
-	log.Println(jwtToken)
-	request.Header.Add("Authorization", jwtToken)
 	var client http.Client
 	response, err := client.Do(request)
 	if err != nil {
@@ -192,14 +189,20 @@ func (s service) DeleteCollection(ctx context.Context, dto CollectionDTO) error 
 // CreateTicket creates ticket on 12 person tournament
 func (s service) CreateTicket(ctx context.Context, dto CreateTicketDTO) (string, error) {
 	url := createTicketURL
-	payload := fmt.Sprintf(`{
-	"user_id": "asd",
-	"ticket_price": %d,
-	"player_amount": %d,
-	"game_type": %s,
-	"prize_id": "in_dev"
-}`, ticketPrize, playersAmount, dto.GameType)
-	body := io.NopCloser(strings.NewReader(payload))
+	cticketDTO := CTicketDTO{
+		UserID:       dto.UserID,
+		IsGift:       false,
+		TicketPrice:  ticketPrize,
+		PlayerAmount: playersAmount,
+		GameType:     dto.GameType,
+		PrizeId:      "",
+	}
+
+	bytes, err := json.Marshal(&cticketDTO)
+	if err != nil {
+		return "", err
+	}
+	body := io.NopCloser(strings.NewReader(string(bytes)))
 	request, err := http.NewRequestWithContext(ctx, http.MethodPost, url, body)
 	if err != nil {
 		return "", fmt.Errorf("failed to make request due to: %v", err)
@@ -214,7 +217,11 @@ func (s service) CreateTicket(ctx context.Context, dto CreateTicketDTO) (string,
 		return "", fmt.Errorf("response is nil")
 	}
 	if response.StatusCode != http.StatusCreated {
-		return "", fmt.Errorf("wrong status code: %d", response.StatusCode)
+		bytes, err := io.ReadAll(response.Body)
+		if err != nil {
+			return "", err
+		}
+		return "", fmt.Errorf("wrong status code: %d, response body: %s", response.StatusCode, string(bytes))
 	}
 
 	var responseDTO TicketDTO
@@ -227,17 +234,35 @@ func (s service) CreateTicket(ctx context.Context, dto CreateTicketDTO) (string,
 }
 
 func (s service) AddTicketToWinner(ctx context.Context, dto RecordDTO) error {
-	// TODO implement create ticket with user_id
-	s.logger.Println("ADD TICKET TO WINNER NOT IMPLEMENTED!!!")
+	records, err := s.storage.FindAll(ctx, dto)
+	if err != nil {
+		return fmt.Errorf("failed to find all records due to: %v", err)
+	}
+	if len(records) == 0 {
+		s.logger.Println("EMPTY RECORDS LIST")
+		return nil
+	}
+	s.logger.Printf("GET THE FIRST RECORD: %+v", records[0])
+	dto.UserID = records[0].UserID
+	dto.Username = records[0].Username
+	dto.UserScore = records[0].UserScore
+	ticketDTO := NewCreateTicketDTO(dto.TableName, dto)
+	_, err = s.CreateTicket(ctx, ticketDTO)
+	if err != nil {
+		return fmt.Errorf("failed to create ticket due to: %v", err)
+	}
 	return nil
+
 }
 
 func (s service) UpdateTable(ctx context.Context, dto CollectionDTO) (int64, error) {
+	s.logger.Println("GOT INTO UPDATE TABLE")
 	newExpiration := time.Now().Add(timeDelta).Unix()
 	recordDTO := RecordDTO{
 		TableName: dto.Name,
 		JWTToken:  dto.JWTToken,
 	}
+	s.logger.Printf("CREATED RECORD DTO: %+v", recordDTO)
 	err := s.AddTicketToWinner(ctx, recordDTO)
 	if err != nil {
 		return 0, fmt.Errorf("failed to add ticket to winner due to: %v", err)
