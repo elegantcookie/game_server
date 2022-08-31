@@ -292,7 +292,8 @@ func (h *Handler) CreateCollection(w http.ResponseWriter, r *http.Request) error
 	if err != nil {
 		return auth.BadRequestError("invalid JSON scheme. check swagger API")
 	}
-	err = h.TrainingService.CreateCollection(context.Background(), dto)
+	ctx := context.WithValue(r.Context(), "Authorization", r.Header.Get("Authorization"))
+	err = h.TrainingService.CreateCollection(ctx, dto)
 	if err != nil {
 		return err
 	}
