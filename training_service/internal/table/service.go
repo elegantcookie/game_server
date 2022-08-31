@@ -37,8 +37,9 @@ type Service interface {
 	GetCollectionNames(ctx context.Context) ([]Collection, error)
 	GetById(ctx context.Context, dto RecordDTO) (Record, error)
 	GetByUserId(ctx context.Context, dto RecordDTO) (u Record, err error)
-	Update(ctx context.Context, dto RecordDTO) error
 	Delete(ctx context.Context, dto RecordDTO) error
+	Update(ctx context.Context, dto RecordDTO) error
+	UpdateTime(ctx context.Context, tableName string) (int64, error)
 }
 
 func (s service) CreateCollection(ctx context.Context, dto CollectionDTO) error {
@@ -48,16 +49,14 @@ func (s service) CreateCollection(ctx context.Context, dto CollectionDTO) error 
 	if err != nil {
 		return fmt.Errorf("failed to create record. error: %w", err)
 	}
-	jwtToken := ctx.Value("Authorization").(string)
-	err = s.NotifyManager(ctx, jwtToken, dto.Name, time.Now().Add(timeDelta).Unix())
+	err = s.NotifyManager(ctx, dto.Name, time.Now().Add(timeDelta).Unix())
 	if err != nil {
 		return fmt.Errorf("failed to notify manager due to: %v", err)
 	}
 	return nil
 }
 
-func (s service) NotifyManager(ctx context.Context, jwtToken, gameType string, startTime int64) error {
-	log.Printf("JWT TOKEN: %v", jwtToken)
+func (s service) NotifyManager(ctx context.Context, gameType string, startTime int64) error {
 	u := notifyMangerURL
 	dto := NotifyManagerDTO{
 		Type:       typeTraining,
@@ -70,8 +69,6 @@ func (s service) NotifyManager(ctx context.Context, jwtToken, gameType string, s
 	}
 	body := io.NopCloser(strings.NewReader(string(bytes)))
 	request, err := http.NewRequestWithContext(ctx, http.MethodPost, u, body)
-	log.Println(jwtToken)
-	request.Header.Add("Authorization", jwtToken)
 	var client http.Client
 	response, err := client.Do(request)
 	if err != nil {

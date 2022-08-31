@@ -17,6 +17,7 @@ var (
 	getRecordByUserIDUrl = "/api/training/get/userid"
 	getAllCollectionsUrl = "/api/training/collections/get/all"
 	collectionsUrl       = "/api/training/collections"
+	updateTimeURL        = "/api/training/time/:game_type"
 )
 
 type Handler struct {
@@ -34,6 +35,7 @@ func (h *Handler) Register(router *httprouter.Router) {
 	router.HandlerFunc(http.MethodPatch, recordsUrl, auth.Middleware(h.PartiallyUpdateRecord))
 	router.HandlerFunc(http.MethodPost, collectionsUrl, auth.Middleware(h.CreateCollection))
 	router.HandlerFunc(http.MethodDelete, collectionsUrl, auth.Middleware(h.DeleteCollectionByName))
+	router.Handler(http.MethodPut, updateTimeURL, auth.NoAuthMiddleware(h.UpdateTime))
 }
 
 // Create record
@@ -327,5 +329,22 @@ func (h *Handler) DeleteCollectionByName(w http.ResponseWriter, r *http.Request)
 	}
 	w.WriteHeader(http.StatusNoContent)
 
+	return nil
+}
+
+func (h *Handler) UpdateTime(w http.ResponseWriter, r *http.Request) error {
+	gameType := httprouter.ParamsFromContext(r.Context()).ByName("game_type")
+	h.Logger.Infof("UPDATE TABLE: %s", gameType)
+	expiration, err := h.TrainingService.UpdateTime(r.Context(), gameType)
+	if err != nil {
+		return err
+	}
+	tmp := map[string]int64{"expiration": expiration}
+	bytes, err := json.Marshal(&tmp)
+	if err != nil {
+		return err
+	}
+	w.Write(bytes)
+	h.Logger.Println(string(bytes))
 	return nil
 }
