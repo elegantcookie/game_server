@@ -25,7 +25,7 @@ type Handler struct {
 }
 
 func (h *Handler) Register(router *httprouter.Router) {
-	router.HandlerFunc(http.MethodPost, ticketsUrl, auth.Middleware(h.CreateTicket))
+	router.HandlerFunc(http.MethodPost, ticketsUrl, auth.NoAuthMiddleware(h.CreateTicket))
 	router.HandlerFunc(http.MethodPost, getTicketUrl, auth.Middleware(h.GetTicketById))
 	router.HandlerFunc(http.MethodPost, getAllTicketsUrl, auth.Middleware(h.GetTickets))
 	router.HandlerFunc(http.MethodDelete, ticketsUrl, auth.Middleware(h.DeleteTicket))

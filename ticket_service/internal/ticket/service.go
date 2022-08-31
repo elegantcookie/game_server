@@ -63,7 +63,6 @@ func (s service) Create(ctx context.Context, dto TicketDTO) (ticketID string, er
 	if err != nil {
 		return "", fmt.Errorf("failed to marshal data due to: %v", err)
 	}
-	log.Println("ASDASDASD")
 	reqBody := io.NopCloser(strings.NewReader(string(bytes)))
 	request, err := http.NewRequestWithContext(ctx, http.MethodPut, AddTicketByIDURL, reqBody)
 	if err != nil {
