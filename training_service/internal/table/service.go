@@ -2,9 +2,16 @@ package table
 
 import (
 	"context"
+	"encoding/json"
 	"errors"
 	"fmt"
+	"io"
+	"log"
+	"net/http"
+	"strings"
+	"time"
 	"training_service/internal/auth"
+	"training_service/internal/config"
 	"training_service/pkg/logging"
 )
 
@@ -30,8 +37,9 @@ type Service interface {
 	GetCollectionNames(ctx context.Context) ([]Collection, error)
 	GetById(ctx context.Context, dto RecordDTO) (Record, error)
 	GetByUserId(ctx context.Context, dto RecordDTO) (u Record, err error)
-	Update(ctx context.Context, dto RecordDTO) error
 	Delete(ctx context.Context, dto RecordDTO) error
+	Update(ctx context.Context, dto RecordDTO) error
+	UpdateTime(ctx context.Context, tableName string) (int64, error)
 }
 
 func (s service) CreateCollection(ctx context.Context, dto CollectionDTO) error {
@@ -40,6 +48,44 @@ func (s service) CreateCollection(ctx context.Context, dto CollectionDTO) error 
 	err := s.storage.CreateCollection(ctx, dto)
 	if err != nil {
 		return fmt.Errorf("failed to create record. error: %w", err)
+	}
+	err = s.NotifyManager(ctx, dto.Name, time.Now().Add(timeDelta).Unix())
+	if err != nil {
+		return fmt.Errorf("failed to notify manager due to: %v", err)
+	}
+	return nil
+}
+
+func (s service) NotifyManager(ctx context.Context, gameType string, startTime int64) error {
+	u := notifyMangerURL
+	dto := NotifyManagerDTO{
+		Type:       typeTraining,
+		GameType:   gameType,
+		Expiration: startTime,
+	}
+	bytes, err := json.Marshal(&dto)
+	if err != nil {
+		return fmt.Errorf("failed to marshal data due to: %v", err)
+	}
+	body := io.NopCloser(strings.NewReader(string(bytes)))
+	request, err := http.NewRequestWithContext(ctx, http.MethodPost, u, body)
+	var client http.Client
+	response, err := client.Do(request)
+	if err != nil {
+		log.Printf("failed to do request due to: %v", err)
+		return err
+	}
+	if response == nil {
+		//log.Println("response is null")
+		return fmt.Errorf("response is null")
+	}
+	if response.StatusCode != 200 {
+		bytes, err := io.ReadAll(body)
+		if err != nil {
+			return err
+		}
+		log.Printf(string(bytes))
+		return fmt.Errorf("got wrong status code: %d", response.StatusCode)
 	}
 	return nil
 }
@@ -53,7 +99,6 @@ func (s service) Create(ctx context.Context, dto RecordDTO) (recordID string, er
 		}
 		return recordID, fmt.Errorf("failed to create record. error: %w", err)
 	}
-
 	return recordID, nil
 }
 
@@ -135,4 +180,24 @@ func (s service) DeleteCollection(ctx context.Context, dto CollectionDTO) error 
 		return fmt.Errorf("failed to delete record. error: %w", err)
 	}
 	return nil
+}
+
+// UpdateTime returns new deletion time: + 48 hours
+func (s service) UpdateTime(ctx context.Context, tableName string) (int64, error) {
+	s.logger.Println("GOT INTO UPDATE TABLE")
+	newExpiration := time.Now().Add(timeDelta).Unix()
+	dto := CollectionDTO{
+		AccessKey: config.GetConfig().Keys.AccessKey,
+		Name:      tableName,
+	}
+	err := s.DeleteCollection(ctx, dto)
+	if err != nil {
+		return 0, fmt.Errorf("failed to delete collection due to: %v", err)
+	}
+
+	err = s.CreateCollection(ctx, dto)
+	if err != nil {
+		return 0, fmt.Errorf("failed to create collection due to: %v", err)
+	}
+	return newExpiration, nil
 }

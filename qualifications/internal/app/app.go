@@ -53,8 +53,8 @@ func NewApp(cfg *config.Config, logger *logging.Logger) (App, error) {
 	}
 
 	usersHandler := table.Handler{
-		Logger:          logging.GetLogger(cfg.AppConfig.LogLevel),
-		TrainingService: service,
+		Logger:               logging.GetLogger(cfg.AppConfig.LogLevel),
+		QualificationService: service,
 	}
 	usersHandler.Register(router)
 

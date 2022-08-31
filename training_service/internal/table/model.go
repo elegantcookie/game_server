@@ -24,6 +24,12 @@ type CollectionDTO struct {
 	Name      string `json:"table_name"`
 }
 
+type NotifyManagerDTO struct {
+	Type       string `json:"type"`
+	GameType   string `json:"game_type"`
+	Expiration int64  `json:"expiration"`
+}
+
 func NewRecord(dto RecordDTO) Record {
 	return Record{
 		UserID:    dto.UserID,

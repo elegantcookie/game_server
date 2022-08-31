@@ -82,7 +82,8 @@ func (s service) UpdateTime(ctx context.Context, lr LobbyRecord) (res LRResponse
 	case qualification:
 		u = fmt.Sprintf(updateQualificationTime, lr.GameType)
 		res.Delete = true
-	// TODO delete this on release
+	case training:
+		u = fmt.Sprintf(updateTrainingTime, lr.GameType)
 	default:
 		u = fmt.Sprintf(updateQualificationTime, lr.GameType)
 		res.Delete = true
